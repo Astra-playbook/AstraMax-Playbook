@@ -25,6 +25,8 @@ An AME Wizard Beta `.apbx` playbook that combines:
 
 Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.3.6.
 
+**Website:** [astra-playbook.github.io/AstraMax-Playbook](https://astra-playbook.github.io/AstraMax-Playbook/)
+
 ## Download
 
 - **[Astra-1.3.6.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.3.6.apbx)** - 340,667,395 bytes, AME Wizard Beta playbook (7z/AES-256, password `malte`)
