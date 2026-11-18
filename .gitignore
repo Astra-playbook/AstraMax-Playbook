@@ -1,9 +1,12 @@
-# Encrypted playbook artifacts (large, built locally)
-*.apbx
+# Historical playbook builds (current release is tracked through Git LFS)
+Astra-1.1.0.apbx
+Astra-1.2.0.apbx
+Astra-1.3.0.apbx
+AstraMax-0.*.apbx
+AstraMax.apbx
 
-# Bundled installers and the unsigned app (redistribution not confirmed in-repo)
+# Large third-party installers and the portable archiver
 src/Executables/Astra-Max-Setup.exe
-src/Executables/AstraTweaks/
 src/Executables/Redist/*.exe
 tools/7zr.exe
 
@@ -11,5 +14,4 @@ tools/7zr.exe
 legacy/
 
 # Local build/test output
-AstraMax.apbx
 *.log

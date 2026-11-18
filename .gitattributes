@@ -1,0 +1,2 @@
+*.apbx filter=lfs diff=lfs merge=lfs -text
+src/Executables/AstraTweaks/Astra.exe filter=lfs diff=lfs merge=lfs -text

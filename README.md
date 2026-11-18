@@ -831,7 +831,7 @@ powershell -ExecutionPolicy Bypass -File tools/build.ps1
 
 `validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.3.6 artifact built from this tree is `Astra-1.3.6.apbx`, SHA256 `E591C71FDB8BF783DE8B896412ABE2164CAD34D470852E8E9059F2DB3FF4C75A`.
 
-The repository intentionally excludes `*.apbx`, the bundled unsigned app (`src/Executables/AstraTweaks/`), `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/` and `tools/7zr.exe`, plus the retired `legacy/` dashboard. Supply those files locally before running `build.ps1`; it will fail its required-files check without them.
+The repository tracks `Astra-1.3.6.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
 
 The `.apbx` must be a **7z archive, AES-256 encrypted with password `malte`, with the file list encrypted** (`-mhe=on`). That is AME Wizard's convention; a plain zip is rejected at load with *"Playbook must be encrypted using 'malte' as the password."* `build.ps1` does this through the portable `tools/7zr.exe` (download it from https://www.7-zip.org/a/7zr.exe if missing) using the equivalent of:
 
