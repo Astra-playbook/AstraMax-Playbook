@@ -1,0 +1,58 @@
+title: Dedicated CPU and GPU settings
+description: Optional AC processor policies and graphics preferences with saved originals
+actions:
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature CpuBoost -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: cpu-boost
+
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature CpuEpp -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: cpu-epp
+
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature GpuScheduling -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: gpu-hags
+
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature WindowedGaming -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: gpu-windowed
+
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature PciePower -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: pcie-aspm
+
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature DiskIdle -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: disk-idle
+
+  - !powerShell:
+    command: |
+      & '.\HardwareTweaks.ps1' -Feature DynamicTick -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: dynamic-tick

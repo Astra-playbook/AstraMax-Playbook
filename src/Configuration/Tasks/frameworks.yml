@@ -1,0 +1,55 @@
+title: Game Runtime Frameworks
+description: Bundled DirectX June 2010, Visual C++ 2005-2022, .NET Framework 3.5 and .NET Desktop Runtime 8
+actions:
+  # Bundled DirectX End-User Runtime (d3dx9, XInput, XAudio and friends).
+  # The June 2010 redist extracts to a temp folder and then runs DXSETUP silently.
+  - !writeStatus: {status: 'Installing bundled DirectX End-User Runtime', option: install-directx}
+  - !powerShell:
+    command: |
+      $dx = Join-Path (Get-Location) 'Redist\directx_Jun2010_redist.exe'
+      $tmp = Join-Path $env:TEMP 'AstraDX'
+      New-Item -ItemType Directory -Path $tmp -Force | Out-Null
+      Start-Process -FilePath $dx -ArgumentList '/Q', "/T:$tmp" -Wait
+      $setup = Join-Path $tmp 'DXSETUP.exe'
+      if (Test-Path -LiteralPath $setup) {
+          Start-Process -FilePath $setup -ArgumentList '/silent' -Wait
+      }
+      else { throw 'DirectX setup did not extract' }
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: install-directx
+
+  # Bundled Visual C++ 2005-2022 All-in-One (official Microsoft payloads).
+  - !writeStatus: {status: 'Installing bundled Visual C++ Redistributables', option: install-vcredist}
+  - !powerShell:
+    command: |
+      $exe = Join-Path (Get-Location) 'Redist\VisualCppRedist_AIO_x86_x64.exe'
+      Start-Process -FilePath $exe -ArgumentList '/ai', '/gm2' -Wait
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: install-vcredist
+
+  # .NET Framework 3.5 (needs Windows Update/source access; no standalone redist).
+  - !writeStatus: {status: 'Enabling .NET Framework 3.5', option: install-netfx3}
+  - !run:
+    exe: 'DISM.exe'
+    args: '/Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart'
+    wait: true
+    ignoreErrors: true
+    option: install-netfx3
+
+  # Bundled .NET Desktop Runtime 8 (x64).
+  - !writeStatus: {status: 'Installing bundled .NET Desktop Runtime 8', option: install-dotnet8}
+  - !powerShell:
+    command: |
+      $exe = Join-Path (Get-Location) 'Redist\windowsdesktop-runtime-8.0.34-win-x64.exe'
+      Start-Process -FilePath $exe -ArgumentList '/install', '/quiet', '/norestart' -Wait
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: install-dotnet8

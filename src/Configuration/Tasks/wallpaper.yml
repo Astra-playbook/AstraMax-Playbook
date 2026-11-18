@@ -1,0 +1,38 @@
+title: Astra Wallpaper
+description: Sets the bundled Astra wallpaper theme for the current user
+actions:
+  - !writeStatus: {status: 'Setting the Astra wallpaper', option: wp-astra}
+  - !powerShell:
+    command: |
+      & '.\Wallpaper.ps1' -Image '.\Astra-Wallpaper.png'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: wp-astra
+
+  - !writeStatus: {status: 'Setting the red and purple Astra wallpaper', option: wp-astra-red-purple}
+  - !powerShell:
+    command: |
+      & '.\Wallpaper.ps1' -Image '.\Astra-Wallpaper-RedPurple.png'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: wp-astra-red-purple
+
+  - !powerShell:
+    command: |
+      & '.\PersonalWallpaper.ps1' -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: wp-personal-static
+
+  - !powerShell:
+    command: |
+      & '.\PersonalWallpaper.ps1' -Live -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: wp-personal-live

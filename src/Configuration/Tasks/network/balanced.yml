@@ -1,0 +1,18 @@
+title: Balanced Network Stack
+description: Trims background network noise without restricting TCP autotuning
+actions:
+  - !writeStatus: {status: 'Applying balanced network stack settings'}
+  - !cmd: {command: 'netsh int tcp set global autotuninglevel=normal', ignoreErrors: true}
+  - !cmd: {command: 'netsh int tcp set global rss=enabled', ignoreErrors: true}
+  - !cmd: {command: 'netsh int tcp set global rsc=enabled', ignoreErrors: true}
+  - !cmd: {command: 'netsh int tcp set global timestamps=disabled', ignoreErrors: true}
+  - !cmd: {command: 'netsh int tcp set global ecncapability=disabled', ignoreErrors: true}
+  - !cmd: {command: 'netsh int tcp set global netdma=enabled', ignoreErrors: true}
+
+  # WPAD auto-discovery relays through a proxy lookup on every network change
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Wpad', value: 'WpadOverride', type: REG_DWORD, data: '1'}
+
+  # Remove the 10 Mbps throttling cap for non-multimedia traffic
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile', value: 'NetworkThrottlingIndex', type: REG_DWORD, data: '4294967295'}
+
+  - !cmd: {command: 'ipconfig /flushdns', ignoreErrors: true}

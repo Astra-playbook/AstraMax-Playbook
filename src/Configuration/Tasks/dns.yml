@@ -1,0 +1,42 @@
+title: DNS Resolver
+description: Sets or resets DNS on active adapters that have a default gateway
+actions:
+  - !writeStatus: {status: 'Resetting DNS to DHCP', option: dns-dhcp}
+  - !powerShell:
+    command: |
+      & '.\Network.ps1' -Dns Auto
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: dns-dhcp
+
+  - !writeStatus: {status: 'Setting Cloudflare DNS', option: dns-cloudflare}
+  - !powerShell:
+    command: |
+      & '.\Network.ps1' -Dns Cloudflare
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: dns-cloudflare
+
+  - !writeStatus: {status: 'Setting Google DNS', option: dns-google}
+  - !powerShell:
+    command: |
+      & '.\Network.ps1' -Dns Google
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: dns-google
+
+  - !writeStatus: {status: 'Setting Quad9 DNS', option: dns-quad9}
+  - !powerShell:
+    command: |
+      & '.\Network.ps1' -Dns Quad9
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: dns-quad9

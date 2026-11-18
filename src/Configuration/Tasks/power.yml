@@ -1,0 +1,8 @@
+title: Core Parking
+description: Disables CPU core parking for the active power plan on AC and battery
+actions:
+  - !writeStatus: {status: 'Disabling CPU core parking'}
+  - !cmd: {command: 'powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100', ignoreErrors: true}
+  - !cmd: {command: 'powercfg /setdcvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100', ignoreErrors: true}
+  - !cmd: {command: 'powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMAXCORES 100', ignoreErrors: true}
+  - !cmd: {command: 'powercfg /setactive SCHEME_CURRENT', ignoreErrors: true}

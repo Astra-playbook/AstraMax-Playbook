@@ -1,0 +1,43 @@
+title: Debloat
+description: Removes preinstalled Windows apps at the selected tier, for every account, then deletes each removed package's data folders and per-user AppModel registry keys and records every action. Insane is a separate warned opt-in; apps and deleted data cannot be undone. Services are handled by the separate service tier
+actions:
+  # Tiers are cumulative: Moderate removes Light too, Extreme removes both, Insane removes everything (same lists as Debloat.ps1)
+  - !writeStatus: {status: 'Debloating Windows apps (light)', option: debloat-light}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Light
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: debloat-light
+
+  - !writeStatus: {status: 'Debloating Windows apps (moderate)', option: debloat-moderate}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Moderate
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: debloat-moderate
+
+  - !writeStatus: {status: 'Debloating Windows apps (extreme)', option: debloat-extreme}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Extreme
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: debloat-extreme
+
+  - !writeStatus: {status: 'Stripping the remaining apps (insane)', option: debloat-insane}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Insane
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: debloat-insane

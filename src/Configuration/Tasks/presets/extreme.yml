@@ -1,0 +1,60 @@
+title: Extreme Preset
+description: Adds aggressive service, power, memory and network tweaks on top of Recommended. Read the README before using this tier.
+actions:
+  # Cumulative: apply Recommended (which applies Light)
+  - !task: {path: 'Tasks\presets\recommended.yml'}
+
+  # Background services
+  - !writeStatus: {status: 'Disabling background services'}
+  - !service: {name: 'WSearch', operation: change, startup: 4}
+  - !service: {name: 'Spooler', operation: change, startup: 4}
+  - !service: {name: 'Fax', operation: change, startup: 4}
+  - !service: {name: 'RemoteRegistry', operation: change, startup: 4}
+  - !service: {name: 'RetailDemo', operation: change, startup: 4}
+  - !service: {name: 'WMPNetworkSvc', operation: change, startup: 4}
+  - !service: {name: 'MapsBroker', operation: change, startup: 4}
+  - !service: {name: 'NDU', operation: change, startup: 4}
+  - !service: {name: 'WerSvc', operation: change, startup: 4}
+  - !service: {name: 'XblAuthManager', operation: change, startup: 4}
+  - !service: {name: 'XblGameSave', operation: change, startup: 4}
+  - !service: {name: 'XboxGipSvc', operation: change, startup: 4}
+  - !service: {name: 'XboxNetApiSvc', operation: change, startup: 4}
+
+  # Power: no throttling, no core parking, no USB suspend
+  - !writeStatus: {status: 'Maximizing power responsiveness'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling', value: 'PowerThrottlingOff', type: REG_DWORD, data: '1'}
+  - !cmd: {command: 'powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 100', ignoreErrors: true}
+  - !cmd: {command: 'powercfg /setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0', ignoreErrors: true}
+  - !cmd: {command: 'powercfg /setactive SCHEME_CURRENT', ignoreErrors: true}
+
+  # Prefetch and memory (16 GB+ recommended)
+  - !writeStatus: {status: 'Tuning prefetch and memory management'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters', value: 'EnablePrefetcher', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\PrefetchParameters', value: 'EnableSuperfetch', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management', value: 'LargeSystemCache', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management', value: 'DisablePagingExecutive', type: REG_DWORD, data: '1'}
+
+  # Network latency: disable Nagle on active interfaces
+  - !writeStatus: {status: 'Configuring network latency settings'}
+  - !powerShell:
+    command: |
+      Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces' | ForEach-Object {
+        Set-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -Type DWord -Value 1 -Force -ErrorAction SilentlyContinue
+        Set-ItemProperty -Path $_.PSPath -Name 'TCPNoDelay' -Type DWord -Value 1 -Force -ErrorAction SilentlyContinue
+      }
+    runas: system
+    wait: true
+
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters', value: 'EnableMulticast', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Wpad', value: 'WpadOverride', type: REG_DWORD, data: '1'}
+
+  # Legacy name resolution off
+  - !writeStatus: {status: 'Disabling NetBIOS name resolution'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Services\NetBT\Parameters', value: 'EnableLMHOSTS', type: REG_DWORD, data: '0'}
+  - !powerShell:
+    command: |
+      Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces' | ForEach-Object {
+        Set-ItemProperty -Path $_.PSPath -Name 'NetbiosOptions' -Type DWord -Value 2 -Force -ErrorAction SilentlyContinue
+      }
+    runas: system
+    wait: true

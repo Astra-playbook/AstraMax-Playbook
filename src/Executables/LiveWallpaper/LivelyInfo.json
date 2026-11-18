@@ -1,0 +1,10 @@
+{
+  "AppVersion": "2.2.1.0",
+  "Title": "Astra Personal Hair Sway",
+  "Desc": "Local image with subtle masked motion at 24 fps; pauses with Lively or when hidden. No artwork is bundled.",
+  "Author": "Astra",
+  "Type": 1,
+  "FileName": "index.html",
+  "Arguments": "--pause-event true",
+  "IsAbsolutePath": false
+}

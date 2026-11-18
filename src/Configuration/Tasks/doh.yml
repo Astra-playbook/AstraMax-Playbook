@@ -1,0 +1,12 @@
+title: DNS over HTTPS
+description: Enables DoH for whichever supported resolver is configured on the adapters
+actions:
+  - !writeStatus: {status: 'Enabling DNS over HTTPS', option: dns-doh}
+  - !powerShell:
+    command: |
+      & '.\Network.ps1' -Doh On
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: dns-doh

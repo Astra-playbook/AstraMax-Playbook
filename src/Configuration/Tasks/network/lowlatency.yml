@@ -1,0 +1,33 @@
+title: Low Latency Network Stack
+description: Balanced stack plus Nagle, NetBIOS and LLMNR disabled. Best for wired connections.
+actions:
+  - !task: {path: 'Tasks\network\balanced.yml'}
+
+  - !writeStatus: {status: 'Disabling Nagle coalescing'}
+  - !powerShell:
+    command: |
+      Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces' | ForEach-Object {
+        Set-ItemProperty -Path $_.PSPath -Name 'TcpAckFrequency' -Type DWord -Value 1 -Force -ErrorAction SilentlyContinue
+        Set-ItemProperty -Path $_.PSPath -Name 'TCPNoDelay' -Type DWord -Value 1 -Force -ErrorAction SilentlyContinue
+        Set-ItemProperty -Path $_.PSPath -Name 'TcpDelAckTicks' -Type DWord -Value 0 -Force -ErrorAction SilentlyContinue
+      }
+    runas: system
+    wait: true
+    ignoreErrors: true
+
+  # Legacy multicast name resolution adds broadcast noise and fallback delays
+  - !writeStatus: {status: 'Disabling NetBIOS and LLMNR'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters', value: 'EnableMulticast', type: REG_DWORD, data: '0'}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Services\NetBT\Parameters', value: 'EnableLMHOSTS', type: REG_DWORD, data: '0'}
+  - !powerShell:
+    command: |
+      Get-ChildItem 'HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters\Interfaces' | ForEach-Object {
+        Set-ItemProperty -Path $_.PSPath -Name 'NetbiosOptions' -Type DWord -Value 2 -Force -ErrorAction SilentlyContinue
+      }
+    runas: system
+    wait: true
+    ignoreErrors: true
+
+  # Network Data Usage Monitoring is pure telemetry for a gaming machine
+  - !service: {name: 'NDU', operation: change, startup: 4}
+  - !cmd: {command: 'ipconfig /flushdns', ignoreErrors: true}

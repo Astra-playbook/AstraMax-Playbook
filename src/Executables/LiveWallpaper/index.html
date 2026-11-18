@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Astra Personal Live Wallpaper</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090611}
+#image{position:absolute;width:100%;height:100%;object-fit:cover}
+#motion{position:absolute;pointer-events:none}
+#error{position:absolute;inset:0;display:grid;place-items:center;color:#e9ddf4;font:18px system-ui;text-align:center;padding:30px}
+#error[hidden]{display:none}
+</style>
+</head>
+<body>
+<img id="image" src="image.png" alt="">
+<canvas id="motion"></canvas>
+<div id="error" hidden>Import your own image.png into this wallpaper folder.</div>
+<script src="motion.js"></script>
+<script>
+const image = document.getElementById('image');
+const canvas = document.getElementById('motion');
+const context = canvas.getContext('2d');
+const config = window.astraMotion || {points:[]};
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+let source, output, weights, bounds;
+let pausedByLively = false;
+let animationId = 0;
+let lastFrame = -Infinity;
+
+function insidePolygon(x,y,points) {
+  let inside = false;
+  for (let i=0,j=points.length-1;i<points.length;j=i++) {
+    const [xi,yi]=points[i], [xj,yj]=points[j];
+    if ((yi>y)!==(yj>y) && x<(xj-xi)*(y-yi)/(yj-yi)+xi) inside=!inside;
+  }
+  return inside;
+}
+function resize() {
+  if (!bounds) return;
+  const scale=Math.max(innerWidth/image.naturalWidth,innerHeight/image.naturalHeight);
+  const left=(innerWidth-image.naturalWidth*scale)/2;
+  const top=(innerHeight-image.naturalHeight*scale)/2;
+  Object.assign(canvas.style,{left:`${left+bounds.x*scale}px`,top:`${top+bounds.y*scale}px`,width:`${bounds.width*scale}px`,height:`${bounds.height*scale}px`});
+}
+function renderAt(seconds) {
+  if (!source) return;
+  const width=bounds.width, height=bounds.height;
+  const sway=Math.sin(seconds*1.25)*1.65+Math.sin(seconds*2.1)*0.45;
+  for(let y=0;y<height;y++) {
+    for(let x=0;x<width;x++) {
+      const index=y*width+x, offset=index*4;
+      const weight=weights[index];
+      if(weight===0) {
+        for(let c=0;c<4;c++) output.data[offset+c]=source.data[offset+c];
+        continue;
+      }
+      const sx=Math.max(0,Math.min(width-1,x-sway*weight));
+      const x0=Math.floor(sx), x1=Math.min(width-1,x0+1), mix=sx-x0;
+      const a=(y*width+x0)*4, b=(y*width+x1)*4;
+      for(let c=0;c<3;c++) output.data[offset+c]=source.data[a+c]*(1-mix)+source.data[b+c]*mix;
+      output.data[offset+3]=255;
+    }
+  }
+  context.putImageData(output,0,0);
+}
+function tick(time) {
+  if(time-lastFrame>=1000/24) {renderAt(time/1000);lastFrame=time;}
+  animationId=requestAnimationFrame(tick);
+}
+function updatePlayback() {
+  cancelAnimationFrame(animationId);
+  animationId=0;
+  if(!source || document.hidden || pausedByLively || reducedMotion.matches) return;
+  lastFrame=-Infinity;
+  animationId=requestAnimationFrame(tick);
+}
+function livelyWallpaperPlaybackChanged(data) {
+  try {pausedByLively=JSON.parse(data).IsPaused===true;updatePlayback();}
+  catch {console.warn('Invalid Lively playback event');}
+}
+function prepare() {
+  const points=config.points || [];
+  if(points.length<3) {canvas.hidden=true;return;}
+  const xs=points.map(p=>p[0]), ys=points.map(p=>p[1]);
+  const x=Math.max(0,Math.floor(Math.min(...xs))-5), y=Math.max(0,Math.floor(Math.min(...ys))-5);
+  bounds={x,y,width:Math.min(image.naturalWidth-x,Math.ceil(Math.max(...xs))-x+6),height:Math.min(image.naturalHeight-y,Math.ceil(Math.max(...ys))-y+6)};
+  if(bounds.width<=0 || bounds.height<=0) {canvas.hidden=true;return;}
+  canvas.width=bounds.width;canvas.height=bounds.height;
+  context.drawImage(image,x,y,bounds.width,bounds.height,0,0,bounds.width,bounds.height);
+  source=context.getImageData(0,0,bounds.width,bounds.height);
+  output=context.createImageData(bounds.width,bounds.height);
+  weights=new Float32Array(bounds.width*bounds.height);
+  const root=config.rootY ?? Math.max(...ys);
+  const tip=Math.min(...ys);
+  for(let py=0;py<bounds.height;py++) {
+    for(let px=0;px<bounds.width;px++) {
+      const index=py*bounds.width+px, offset=index*4;
+      const gx=px+x, gy=py+y;
+      if(!insidePolygon(gx,gy,points)) continue;
+      const r=source.data[offset],g=source.data[offset+1],b=source.data[offset+2];
+      const hair=Math.max(0,Math.min(1,(Math.min(r,g,b)-85)/80));
+      const anchor=Math.max(0,Math.min(1,(root-gy)/(root-tip)));
+      const edge=Math.min(px,py,bounds.width-px-1,bounds.height-py-1)/5;
+      weights[index]=hair*anchor*anchor*Math.min(1,edge);
+    }
+  }
+  renderAt(0);resize();updatePlayback();
+}
+image.addEventListener('load',prepare,{once:true});
+function showImageError() {document.getElementById('error').hidden=false;canvas.hidden=true;}
+image.addEventListener('error',showImageError,{once:true});
+if(image.complete) {if(image.naturalWidth) prepare();else showImageError();}
+addEventListener('resize',resize);
+document.addEventListener('visibilitychange',updatePlayback);
+reducedMotion.addEventListener('change',updatePlayback);
+</script>
+</body>
+</html>

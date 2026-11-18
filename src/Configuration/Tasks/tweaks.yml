@@ -1,0 +1,132 @@
+title: Extra Tweaks
+description: Input, power, startup and CPU scheduling tweaks
+actions:
+  - !writeStatus: {status: 'Disabling mouse acceleration', option: tweak-mouse}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -Mouse On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-mouse
+
+  - !writeStatus: {status: 'Disabling power throttling', option: tweak-power-throttling}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -PowerThrottling On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-power-throttling
+
+  - !writeStatus: {status: 'Enabling Ultimate Performance', option: tweak-ultimate-plan}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -UltimatePlan On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-ultimate-plan
+
+  - !writeStatus: {status: 'Turning fast startup off', option: tweak-fast-startup}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -FastStartup On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-fast-startup
+
+  - !writeStatus: {status: 'Raising the MMCSS game task', option: tweak-mmcss}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -Mmcss On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-mmcss
+
+  - !writeStatus: {status: 'Allowing global timer resolution requests', option: perf-timer-resolution}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -TimerResolution On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: perf-timer-resolution
+
+  - !writeStatus: {status: 'Disabling network adapter power saving', option: perf-nic-power}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -NicPower On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: perf-nic-power
+
+  - !writeStatus: {status: 'Disabling CPU idle states', option: perf-cpu-idle}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -CpuIdle On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: perf-cpu-idle
+
+  - !writeStatus: {status: 'Disabling memory compression', option: perf-mem-compression}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -MemoryCompression On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: perf-mem-compression
+
+  - !writeStatus: {status: 'Removing the startup app delay', option: tweak-startup-delay}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -StartupDelay On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-startup-delay
+
+  - !writeStatus: {status: 'Disabling search highlights', option: tweak-search-highlights}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -SearchHighlights On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-search-highlights
+
+  - !writeStatus: {status: 'Disabling tips and suggestions', option: tweak-suggestions}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -Suggestions On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-suggestions
+
+  - !writeStatus: {status: 'Hiding recent and frequent files', option: tweak-explorer-recent}
+  - !powerShell:
+    command: |
+      & '.\Tweaks.ps1' -ExplorerRecent On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-explorer-recent

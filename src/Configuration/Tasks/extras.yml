@@ -1,0 +1,30 @@
+title: Extra Tweaks
+description: Optional USB, OneDrive, Edge and driver update tweaks
+actions:
+  # USB devices: disable "allow the computer to turn off this device"
+  - !writeStatus: {status: 'Disabling USB device power saving', option: disable-usb-power}
+  - !powerShell:
+    command: |
+      Get-CimInstance -Namespace root\wmi -ClassName MSPower_DeviceEnable | ForEach-Object {
+        $_.Enable = $false
+        Set-CimInstance -InputObject $_ -ErrorAction SilentlyContinue
+      }
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: disable-usb-power
+
+  # OneDrive
+  - !writeStatus: {status: 'Disabling OneDrive sync', option: disable-onedrive}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive', value: 'DisableFileSyncNGSC', type: REG_DWORD, data: '1', option: disable-onedrive}
+  - !taskKill: {name: 'OneDrive', option: disable-onedrive}
+
+  # Edge background activity
+  - !writeStatus: {status: 'Disabling Edge background activity', option: disable-edge-background}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'StartupBoostEnabled', type: REG_DWORD, data: '0', option: disable-edge-background}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Edge', value: 'BackgroundModeEnabled', type: REG_DWORD, data: '0', option: disable-edge-background}
+
+  # Windows Update driver installs
+  - !writeStatus: {status: 'Blocking Windows Update driver installs', option: block-driver-updates}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching', value: 'SearchOrderConfig', type: REG_DWORD, data: '0', option: block-driver-updates}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate', value: 'ExcludeWUDriversInQualityUpdate', type: REG_DWORD, data: '1', option: block-driver-updates}

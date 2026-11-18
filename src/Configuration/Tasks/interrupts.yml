@@ -1,0 +1,32 @@
+title: Interrupt Handling
+description: Enables MSI interrupts for GPU/NIC and optionally spreads or pins their affinity. Reboot required.
+actions:
+  - !writeStatus: {status: 'Enabling MSI interrupts for GPU and network devices', option: irq-balanced}
+  - !powerShell:
+    command: |
+      & '.\Interrupts.ps1' -Mode Msi
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: irq-balanced
+
+  - !writeStatus: {status: 'Spreading interrupts across all cores', option: irq-aggressive}
+  - !powerShell:
+    command: |
+      & '.\Interrupts.ps1' -Mode Spread
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: irq-aggressive
+
+  - !writeStatus: {status: 'Pinning interrupts away from core 0', option: irq-pinned}
+  - !powerShell:
+    command: |
+      & '.\Interrupts.ps1' -Mode Pin
+    exeDir: true
+    runas: system
+    wait: true
+    ignoreErrors: true
+    option: irq-pinned

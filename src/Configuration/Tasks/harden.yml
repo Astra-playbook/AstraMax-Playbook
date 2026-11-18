@@ -1,0 +1,32 @@
+title: Security Hardening
+description: SmartScreen checks, LLMNR off and AutoRun off, applied before the security choices
+actions:
+  - !writeStatus: {status: 'Enabling SmartScreen checks', option: harden-smartscreen}
+  - !powerShell:
+    command: |
+      & '.\Security.ps1' -SmartScreen On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: harden-smartscreen
+
+  - !writeStatus: {status: 'Turning off LLMNR', option: harden-llmnr}
+  - !powerShell:
+    command: |
+      & '.\Security.ps1' -Llmnr On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: harden-llmnr
+
+  - !writeStatus: {status: 'Turning off AutoRun', option: harden-autorun}
+  - !powerShell:
+    command: |
+      & '.\Security.ps1' -Autorun On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: harden-autorun

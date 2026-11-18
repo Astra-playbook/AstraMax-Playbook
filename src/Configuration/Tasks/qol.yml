@@ -1,0 +1,203 @@
+title: Quality of Life
+description: Explorer, taskbar, clock and Start preferences, all reversible
+actions:
+  - !writeStatus: {status: 'Applying quality-of-life tweaks'}
+
+  - !writeStatus: {status: 'Switching to the classic right-click menu', option: qol-classic-menu}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -ClassicMenu On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-classic-menu
+
+  - !writeStatus: {status: 'Enabling long path support', option: qol-long-paths}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -LongPaths On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-long-paths
+
+  - !writeStatus: {status: 'Showing seconds in the clock', option: qol-clock-seconds}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -ClockSeconds On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-clock-seconds
+
+  - !writeStatus: {status: 'Making Explorer open This PC', option: qol-open-this-pc}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -OpenThisPC On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-open-this-pc
+
+  - !writeStatus: {status: 'Switching to dark mode', option: qol-dark-mode}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -DarkMode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-dark-mode
+
+  - !writeStatus: {status: 'Hiding Start recommendations', option: qol-start-recommendations-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -StartRecommendations On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-start-recommendations-off
+
+  - !writeStatus: {status: 'Enabling clipboard history', option: qol-clipboard-history}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -ClipboardHistory On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-clipboard-history
+
+  - !writeStatus: {status: 'Aligning the taskbar to the left', option: qol-taskbar-left}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -TaskbarLeft On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-taskbar-left
+
+  - !writeStatus: {status: 'Enabling taskbar End task', option: qol-end-task}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -EndTask On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: qol-end-task
+
+  - !writeStatus: {status: 'Stopping background apps', option: tweak-bg-apps}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -BackgroundApps On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-bg-apps
+
+  - !writeStatus: {status: 'Raising foreground scheduling priority', option: tweak-priority-boost}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -PriorityBoost On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-priority-boost
+
+  - !writeStatus: {status: 'Hiding sync provider notifications', option: tweak-sync-ads}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -SyncAds On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-sync-ads
+
+  - !writeStatus: {status: 'Disabling Aero Shake', option: tweak-aero-shake}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -AeroShake On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-aero-shake
+
+  - !writeStatus: {status: 'Turning off window and taskbar animations', option: qol-animations-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Animations On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: qol-animations-off
+
+  - !writeStatus: {status: 'Turning off notification pop-ups', option: tweak-toasts}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Notifications On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-toasts
+
+  - !writeStatus: {status: 'Setting the menu show delay to zero', option: tweak-menu-delay}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -MenuDelay On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-menu-delay
+
+  - !writeStatus: {status: 'Turning off accessibility shortcut keys', option: tweak-a11y-keys}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -A11yKeys On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-a11y-keys
+
+  - !writeStatus: {status: 'Hiding the Windows Ink Workspace button', option: tweak-ink-button}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -InkWorkspace On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-ink-button
+
+  - !writeStatus: {status: 'Applying Edge gaming policies', option: tweak-edge-gaming}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -EdgeGaming On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-edge-gaming
+
+  - !writeStatus: {status: 'Turning off Game Bar startup tips', option: tweak-gamebar-tips}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -GameBarTips On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: tweak-gamebar-tips

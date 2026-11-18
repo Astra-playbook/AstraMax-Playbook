@@ -1,0 +1,5 @@
+title: Network Stack Preset
+description: Applies the selected network stack tuning preset
+actions:
+  - !task: {path: 'Tasks\network\balanced.yml', option: net-balanced}
+  - !task: {path: 'Tasks\network\lowlatency.yml', option: net-lowlatency}

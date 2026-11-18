@@ -1,0 +1,15 @@
+# Encrypted playbook artifacts (large, built locally)
+*.apbx
+
+# Bundled installers and the unsigned app (redistribution not confirmed in-repo)
+src/Executables/Astra-Max-Setup.exe
+src/Executables/AstraTweaks/
+src/Executables/Redist/*.exe
+tools/7zr.exe
+
+# Retired legacy dashboard
+legacy/
+
+# Local build/test output
+AstraMax.apbx
+*.log

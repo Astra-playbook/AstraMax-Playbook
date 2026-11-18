@@ -1,0 +1,33 @@
+title: Insane Preset
+description: Extreme plus notification, Store, network protocol and location hardening. Intended for dedicated gaming systems, expect breakage.
+actions:
+  # Cumulative: apply Extreme (which applies Recommended and Light)
+  - !task: {path: 'Tasks\presets\extreme.yml'}
+
+  # More services
+  - !writeStatus: {status: 'Disabling notification and update services'}
+  - !service: {name: 'DoSvc', operation: change, startup: 4}
+  - !service: {name: 'WpnService', operation: change, startup: 4}
+
+  # Store and update behavior
+  - !writeStatus: {status: 'Hardening Store and update behavior'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\WindowsStore', value: 'AutoDownload', type: REG_DWORD, data: '2'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU', value: 'NoAutoRebootWithLoggedOnUsers', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Microsoft\Windows\Windows Error Reporting', value: 'Disabled', type: REG_DWORD, data: '1'}
+
+  # Legacy network protocols
+  - !writeStatus: {status: 'Disabling legacy network protocols'}
+  - !run: {exe: 'netsh', args: 'interface teredo set state disabled', ignoreErrors: true}
+  - !powerShell:
+    command: |
+      try { Set-SmbServerConfiguration -EnableSMB1Protocol $false -Force -ErrorAction Stop } catch { }
+      Set-Service -Name 'mrxsmb10' -StartupType Disabled -ErrorAction SilentlyContinue
+    runas: system
+    wait: true
+    ignoreErrors: true
+
+  # Location and telemetry extras
+  - !writeStatus: {status: 'Disabling location tracking'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors', value: 'DisableLocation', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection', value: 'LimitDiagnosticLogCollection', type: REG_DWORD, data: '1'}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection', value: 'LimitDumpCollection', type: REG_DWORD, data: '1'}

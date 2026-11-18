@@ -1,0 +1,56 @@
+title: Security Options
+description: Defender, VBS and the optional security-off toggles chosen on the playbook pages
+actions:
+  # Optional: turn SmartScreen off again after the hardening page (security trade-off)
+  - !writeStatus: {status: 'Disabling SmartScreen', option: sec-smartscreen-off}
+  - !powerShell:
+    command: |
+      & '.\Security.ps1' -SmartScreen Off
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: sec-smartscreen-off
+
+  # Optional: hide Defender/Security Center toast alerts
+  - !writeStatus: {status: 'Turning off Security Center alerts', option: sec-security-notifications-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -SecurityNotifications On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: sec-security-notifications-off
+
+  # Defender: keep enabled -> only throttle scan impact
+  - !writeStatus: {status: 'Throttling Defender scans', option: enable-defender}
+  - !powerShell:
+    command: |
+      Set-MpPreference -ScanAvgCPULoadFactor 30 -EnableLowCpuPriority $true -ScanOnlyIfIdleEnabled $true
+    wait: true
+    ignoreErrors: true
+    option: enable-defender
+
+  # Defender: disable real-time protection (security trade-off)
+  - !writeStatus: {status: 'Disabling Defender', option: disable-defender}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender', value: 'DisableAntiSpyware', type: REG_DWORD, data: '1', option: disable-defender}
+  - !registryValue: {path: 'HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection', value: 'DisableRealtimeMonitoring', type: REG_DWORD, data: '1', option: disable-defender}
+  - !powerShell:
+    command: |
+      Set-MpPreference -DisableRealtimeMonitoring $true -DisableIOAVProtection $true -ErrorAction SilentlyContinue
+    wait: true
+    ignoreErrors: true
+    option: disable-defender
+  - !service: {name: 'WinDefend', operation: change, startup: 4, option: disable-defender}
+
+  # VBS: keep enabled, just make sure the hypervisor stays on
+  - !writeStatus: {status: 'Keeping VBS enabled', option: enable-vbs}
+  - !run: {exe: 'bcdedit', args: '/set hypervisorlaunchtype auto', ignoreErrors: true, option: enable-vbs}
+
+  # VBS: disable (breaks Vanguard, FACEIT and other kernel anti-cheats)
+  - !writeStatus: {status: 'Disabling VBS', option: disable-vbs}
+  - !run: {exe: 'bcdedit', args: '/set hypervisorlaunchtype off', ignoreErrors: true, option: disable-vbs}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard', value: 'EnableVirtualizationBasedSecurity', type: REG_DWORD, data: '0', option: disable-vbs}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\DeviceGuard\Scenarios\HypervisorEnforcedCodeIntegrity', value: 'Enabled', type: REG_DWORD, data: '0', option: disable-vbs}
+  - !registryValue: {path: 'HKLM\SYSTEM\CurrentControlSet\Control\LSA', value: 'LsaCfgFlags', type: REG_DWORD, data: '0', option: disable-vbs}

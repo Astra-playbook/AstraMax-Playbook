@@ -1,0 +1,44 @@
+title: Game Profile Setup
+description: Deploys the re-runnable game profile helper and launch option files
+actions:
+  - !writeStatus: {status: 'Deploying game profile helper'}
+  - !powerShell:
+    command: |
+      $dir = 'C:\AstraMax'
+      $launch = Join-Path $dir 'LaunchOptions'
+      New-Item -ItemType Directory -Path $launch -Force | Out-Null
+      Copy-Item -LiteralPath '.\GameProfiles.ps1' -Destination $dir -Force
+      Copy-Item -LiteralPath '.\LaunchOptions.json' -Destination $dir -Force
+
+      $readme = @(
+        'Astra game profiles and launch options',
+        '==========================================',
+        'Re-run a profile:  powershell -ExecutionPolicy Bypass -File "C:\AstraMax\GameProfiles.ps1" -All',
+        'Siege only:        ... -Siege',
+        'Fortnite only:     ... -Fortnite',
+        'Other games:       ... -Cod / -Apex / -CS2',
+        'Check a profile:   ... -Cod -Mode Status',
+        'Restore original:  ... -Cod -Mode Off',
+        'Custom install:    ... -Cod -InstallDirectory "D:\Games\Call of Duty"',
+        'Automatic changes are GPU preference and existing Siege/Fortnite config values only.',
+        'In-game Reflex, render mode and FPS caps remain manual; see each Graphics.txt guide.',
+        '',
+        'Launch options live in LaunchOptions.json in C:\AstraMax. Edit the',
+        '"Options" strings, close Steam, then run the profile with -ApplyLaunchOptions',
+        'to write Siege''s options into Steam. Fortnite options are written as',
+        'instructions in the LaunchOptions folder because Epic stores them per account.'
+      ) -join "`r`n"
+      [System.IO.File]::WriteAllText((Join-Path $dir 'README.txt'), $readme, (New-Object System.Text.UTF8Encoding($false)))
+
+      $desktop = [Environment]::GetFolderPath('Desktop')
+      $ws = New-Object -ComObject WScript.Shell
+      $lnk = $ws.CreateShortcut((Join-Path $desktop 'Astra - Launch Options.lnk'))
+      $lnk.TargetPath = Join-Path $env:SystemRoot 'explorer.exe'
+      $lnk.Arguments = '"C:\AstraMax\LaunchOptions"'
+      $lnk.Save()
+
+      "helper: $dir"
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true

@@ -1,0 +1,42 @@
+title: Extra Privacy and Nags
+description: Lock screen Spotlight, post-update setup prompts and the recently added apps list
+actions:
+  - !writeStatus: {status: 'Turning off lock screen Spotlight', option: extra-spotlight-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Spotlight On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-spotlight-off
+
+  - !writeStatus: {status: 'Turning off post-update setup prompts', option: extra-scoobe-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Scoobe On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-scoobe-off
+
+  - !writeStatus: {status: 'Hiding recently added apps in Start', option: extra-start-recent-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -StartRecentApps On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-start-recent-off
+
+  - !writeStatus: {status: 'Turning off cloud clipboard sync', option: extra-cloud-clipboard-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -CloudClipboard On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-cloud-clipboard-off

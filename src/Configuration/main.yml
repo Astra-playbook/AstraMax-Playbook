@@ -1,0 +1,100 @@
+title: Astra Playbook
+description: Applies the selected tweak preset, power/network/DNS configuration, game profiles, runtimes and the bundled Astra tool
+actions:
+  # Preset tiers are cumulative (light -> recommended -> extreme -> insane)
+  - !writeStatus: {status: 'Applying Light preset', option: preset-light}
+  - !task: {path: 'Tasks\presets\light.yml', option: preset-light}
+
+  - !writeStatus: {status: 'Applying Recommended preset', option: preset-recommended}
+  - !task: {path: 'Tasks\presets\recommended.yml', option: preset-recommended}
+
+  - !writeStatus: {status: 'Applying Extreme preset', option: preset-extreme}
+  - !task: {path: 'Tasks\presets\extreme.yml', option: preset-extreme}
+
+  - !writeStatus: {status: 'Applying Insane preset', option: preset-insane}
+  - !task: {path: 'Tasks\presets\insane.yml', option: preset-insane}
+
+  # Preinstalled app debloat (light / moderate / extreme); runs before anything else is deployed
+  - !writeStatus: {status: 'Debloating preinstalled apps', option: debloat-light}
+  - !task: {path: 'Tasks\debloat.yml'}
+
+  # Windows service tiers (light / moderate / extreme caution), independent of the preset
+  - !writeStatus: {status: 'Setting Windows service tier', option: svc-light}
+  - !task: {path: 'Tasks\services.yml'}
+
+  # Optional extras
+  - !writeStatus: {status: 'Applying extra tweaks'}
+  - !task: {path: 'Tasks\extras.yml'}
+
+  # Input, power, startup and scheduling tweaks
+  - !writeStatus: {status: 'Applying input and power tweaks'}
+  - !task: {path: 'Tasks\tweaks.yml'}
+
+  # Explorer, taskbar and Start preferences
+  - !task: {path: 'Tasks\qol.yml'}
+
+  # Optional per-user privacy and nags
+  - !task: {path: 'Tasks\extra-privacy.yml'}
+
+  # Core parking and interrupt handling
+  - !writeStatus: {status: 'Configuring core parking', option: irq-balanced}
+  - !task: {path: 'Tasks\power.yml', option: irq-balanced}
+  - !task: {path: 'Tasks\power.yml', option: irq-aggressive}
+  - !task: {path: 'Tasks\power.yml', option: irq-pinned}
+  - !task: {path: 'Tasks\interrupts.yml'}
+  - !task: {path: 'Tasks\hardware.yml'}
+
+  # Network stack and DNS
+  - !writeStatus: {status: 'Applying network stack preset'}
+  - !task: {path: 'Tasks\network.yml'}
+  - !writeStatus: {status: 'Configuring DNS'}
+  - !task: {path: 'Tasks\dns.yml'}
+  - !task: {path: 'Tasks\doh.yml'}
+
+  # Game profiles (also deployed as re-runnable desktop shortcuts)
+  - !writeStatus: {status: 'Preparing game profile tools'}
+  - !task: {path: 'Tasks\games\setup.yml'}
+
+  - !writeStatus: {status: 'Applying Rainbow Six Siege profile', option: siege-profile}
+  - !task: {path: 'Tasks\games\siege.yml', option: siege-profile}
+
+  - !writeStatus: {status: 'Applying Fortnite profile', option: fortnite-profile}
+  - !task: {path: 'Tasks\games\fortnite.yml', option: fortnite-profile}
+
+  - !task: {path: 'Tasks\games\additional.yml'}
+  - !task: {path: 'Tasks\games\launch-options.yml'}
+
+  # Wallpaper theme (midnight blue or red/purple)
+  - !writeStatus: {status: 'Setting the Astra wallpaper'}
+  - !task: {path: 'Tasks\wallpaper.yml'}
+
+  # Security hardening, then the security choices (Defender, VBS, optional off toggles)
+  - !writeStatus: {status: 'Applying security hardening'}
+  - !task: {path: 'Tasks\harden.yml'}
+  - !writeStatus: {status: 'Applying security configuration'}
+  - !task: {path: 'Tasks\security.yml'}
+
+  # Game runtime frameworks
+  - !writeStatus: {status: 'Installing game runtimes'}
+  - !task: {path: 'Tasks\frameworks.yml'}
+
+  # Bundled tool
+  - !writeStatus: {status: 'Installing Astra tool'}
+  - !task: {path: 'Tasks\tool.yml'}
+
+  # Astra Tweaks app and the helper scripts it shares
+  - !writeStatus: {status: 'Deploying Astra Tweaks', option: install-astra-tweaks}
+  - !task: {path: 'Tasks\astra-app.yml', option: install-astra-tweaks}
+
+  # Post-install toggle menu (turn any tweak back on or off later)
+  - !writeStatus: {status: 'Deploying post-install toolkit', option: postinstall-tool}
+  - !task: {path: 'Tasks\postinstall.yml', option: postinstall-tool}
+
+  # NVIDIA app and Control Panel download shortcuts (Store-free recovery)
+  - !writeStatus: {status: 'Adding NVIDIA download shortcuts', option: install-nvidia-tools}
+  - !task: {path: 'Tasks\nvidia.yml', option: install-nvidia-tools}
+
+  # Rebuild performance counters after tweaks
+  - !writeStatus: {status: 'Rebuilding performance counters'}
+  - !run: {exe: 'lodctr', args: '/r', ignoreErrors: true}
+  - !run: {exe: 'winmgmt', args: '/resyncperf', ignoreErrors: true}

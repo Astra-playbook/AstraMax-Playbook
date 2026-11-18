@@ -1,0 +1,14 @@
+title: Astra Tool
+description: Runs the bundled Astra installer silently
+actions:
+  - !writeStatus: {status: 'Installing Astra', option: install-astra-max}
+  # NSIS silent switch. If the installer is repacked with another toolchain,
+  # change the args to match it (e.g. Inno Setup uses /VERYSILENT /SUPPRESSMSGBOXES).
+  - !run:
+    exe: 'Astra-Max-Setup.exe'
+    args: '/S'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: install-astra-max

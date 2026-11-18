@@ -1,0 +1,26 @@
+title: Rainbow Six Siege Profile
+description: Per-app GPU preference and existing VSync config value, with targeted restoration
+actions:
+  - !writeStatus: {status: 'Applying Rainbow Six Siege profile', option: siege-profile}
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -Siege
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: siege-profile
+
+  # Re-runnable shortcut for after the game is installed
+  - !powerShell:
+    command: |
+      $desktop = [Environment]::GetFolderPath('Desktop')
+      $ws = New-Object -ComObject WScript.Shell
+      $lnk = $ws.CreateShortcut((Join-Path $desktop 'Astra - Siege Profile.lnk'))
+      $lnk.TargetPath = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+      $lnk.Arguments = '-NoProfile -ExecutionPolicy Bypass -NoExit -File "C:\AstraMax\GameProfiles.ps1" -Siege'
+      $lnk.Save()
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: siege-profile

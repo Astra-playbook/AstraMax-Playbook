@@ -1,0 +1,22 @@
+title: Launch Options
+description: Applies Steam launch options for Siege and writes per-launcher instructions
+actions:
+  - !writeStatus: {status: 'Applying Siege launch options', option: siege-launch-options}
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -Siege -ApplyLaunchOptions
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: siege-launch-options
+
+  - !writeStatus: {status: 'Writing Fortnite launch option instructions', option: fortnite-launch-options}
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -Fortnite -ApplyLaunchOptions
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: fortnite-launch-options

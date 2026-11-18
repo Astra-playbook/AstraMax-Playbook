@@ -1,0 +1,26 @@
+title: Fortnite Profile
+description: Per-app GPU preference and existing VSync/dynamic-resolution values, with saved originals
+actions:
+  - !writeStatus: {status: 'Applying Fortnite profile', option: fortnite-profile}
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -Fortnite
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: fortnite-profile
+
+  # Re-runnable shortcut for after the game is installed
+  - !powerShell:
+    command: |
+      $desktop = [Environment]::GetFolderPath('Desktop')
+      $ws = New-Object -ComObject WScript.Shell
+      $lnk = $ws.CreateShortcut((Join-Path $desktop 'Astra - Fortnite Profile.lnk'))
+      $lnk.TargetPath = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+      $lnk.Arguments = '-NoProfile -ExecutionPolicy Bypass -NoExit -File "C:\AstraMax\GameProfiles.ps1" -Fortnite'
+      $lnk.Save()
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: fortnite-profile

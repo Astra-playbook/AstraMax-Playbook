@@ -1,0 +1,43 @@
+title: Services
+description: Sets Windows background services to the selected tier. Extreme (Caution) also stops search indexing, printing, notifications and Store delivery. Insane is a separate warned opt-in that also disables per-user service templates and merges service hosts after reboot; all three snapshots restore exactly
+actions:
+  # Tiers are cumulative: Moderate disables Light too, Extreme disables both, Insane disables everything (same lists as Debloat.ps1 -Services)
+  - !writeStatus: {status: 'Setting Windows services (light)', option: svc-light}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Light -Services
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: svc-light
+
+  - !writeStatus: {status: 'Setting Windows services (moderate)', option: svc-moderate}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Moderate -Services
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: svc-moderate
+
+  - !writeStatus: {status: 'Setting Windows services (extreme)', option: svc-extreme}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Extreme -Services
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: svc-extreme
+
+  - !writeStatus: {status: 'Stripping the remaining services (insane)', option: svc-insane}
+  - !powerShell:
+    command: |
+      & '.\Debloat.ps1' -Level Insane -Services
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: svc-insane

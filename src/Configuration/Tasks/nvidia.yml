@@ -1,0 +1,12 @@
+title: NVIDIA app and Control Panel
+description: Adds shortcuts to the official NVIDIA App and driver downloads so the Control Panel can be restored without the Microsoft Store
+actions:
+  - !writeStatus: {status: 'Adding NVIDIA download shortcuts', option: install-nvidia-tools}
+  - !powerShell:
+    command: |
+      & '.\NvidiaTools.ps1' -Mode Shortcuts
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: install-nvidia-tools

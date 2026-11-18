@@ -1,0 +1,26 @@
+title: COD, Apex and CS2 profiles
+description: Installed game GPU preferences and manual graphics guides, without anti-cheat changes
+actions:
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -Cod -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: cod-profile
+
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -Apex -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: apex-profile
+
+  - !powerShell:
+    command: |
+      & '.\GameProfiles.ps1' -CS2 -Mode On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: cs2-profile
