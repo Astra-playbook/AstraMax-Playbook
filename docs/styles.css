@@ -137,11 +137,18 @@ code {
   box-shadow: 0 0 22px rgba(208, 43, 224, 0.35);
 }
 
+.brand-text {
+  font-family: Georgia, Cambria, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: 0.13em;
+}
+
 .brand-text strong {
   background: var(--grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  font-weight: 400;
 }
 
 .site-nav {

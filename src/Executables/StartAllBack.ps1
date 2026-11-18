@@ -5,8 +5,9 @@ param()
 $ErrorActionPreference = 'SilentlyContinue'
 $log = New-Object System.Collections.Generic.List[string]
 
-# StartAllBack is commercial, per-user licensed software. The playbook never
-# installs it silently: it stages the setup (when bundled) and adds a shortcut.
+# StartAllBack is commercial, per-user licensed software. The feature option is
+# the consent: a build that bundles the setup installs it silently; a build
+# without it only adds a shortcut to the official page.
 $tools = 'C:\AstraMax\Tools'
 New-Item -ItemType Directory -Path $tools -Force | Out-Null
 $setup = Join-Path $tools 'StartAllBack_setup.exe'
@@ -14,6 +15,17 @@ $bundled = Join-Path $PSScriptRoot 'StartAllBack_setup.exe'
 if (Test-Path -LiteralPath $bundled) {
     Copy-Item -LiteralPath $bundled -Destination $setup -Force
     $log.Add("startallback: setup staged at $setup")
+
+    $proc = Start-Process -FilePath $setup -ArgumentList '/install', '/elevated', '/silent' -PassThru
+    if (-not $proc) {
+        $log.Add('startallback: setup could not start; use the shortcut')
+    }
+    elseif ($proc.WaitForExit(180000)) {
+        $log.Add("startallback: setup finished (exit $($proc.ExitCode)); sign out to load the new shell")
+    }
+    else {
+        $log.Add('startallback: setup did not finish in 3 minutes; finish it from the shortcut')
+    }
 }
 else {
     $log.Add('startallback: setup not bundled; the shortcut opens startallback.com')
@@ -27,9 +39,10 @@ StartAllBack is paid third-party software from startallback.com with a
 per-user license. It is not part of Windows and it is not covered by the
 Astra playbook's undo tools.
 
-Install: double-click "Install StartAllBack" on the desktop (or in the
-Start menu) and follow its setup. Sign out afterwards so the new Start
-menu and taskbar load.
+Install: ticking the StartAllBack option installs it from the bundled
+setup. A build without the setup only adds the "Install StartAllBack"
+shortcut, which opens startallback.com. Sign out after installing so the
+new Start menu and taskbar load.
 
 About search: StartAllBack changes the Start menu and taskbar, not the
 Windows search index. To make Start search itself lighter, enable the

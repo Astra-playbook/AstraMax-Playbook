@@ -89,8 +89,8 @@ actions:
   - !writeStatus: {status: 'Deploying Astra', option: install-astra-tweaks}
   - !task: {path: 'Tasks\astra-app.yml', option: install-astra-tweaks}
 
-  # StartAllBack install shortcut (paid add-on, never installed silently)
-  - !writeStatus: {status: 'Adding the StartAllBack shortcut', option: install-startallback}
+  # StartAllBack (paid add-on; installs only when the option is ticked)
+  - !writeStatus: {status: 'Setting up StartAllBack', option: install-startallback}
   - !task: {path: 'Tasks\startallback.yml', option: install-startallback}
 
   # NVIDIA app and Control Panel download shortcuts (Store-free recovery)
