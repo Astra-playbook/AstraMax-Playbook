@@ -17,6 +17,7 @@
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
 
+  <div id="site-view">
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="brand" href="#top" aria-label="Astra Max home">
@@ -26,7 +27,9 @@
       <nav class="site-nav" aria-label="Main">
         <a href="#app">The app</a>
         <a href="#inside">Screens</a>
-        <a href="#setup">Setup</a>
+        <button class="nav-lines" id="open-playbook" type="button" aria-label="Open the playbook" title="Open the playbook">
+          <span></span><span></span><span></span>
+        </button>
         <a class="nav-cta" href="#download">Download</a>
       </nav>
     </div>
@@ -235,37 +238,6 @@
       </div>
     </section>
 
-    <section class="section section-alt" id="setup">
-      <div class="wrap">
-        <div class="section-head">
-          <p class="kicker">Astra Max Setup</p>
-          <h2>A normal installer, three screens.</h2>
-          <p class="section-lede">The playbook launches Astra Max Setup silently. Run it yourself and you get the standard intro, destination and component pages.</p>
-        </div>
-
-        <div class="setup-strip">
-          <figure class="setup-step">
-            <div class="shot-frame">
-              <img src="assets/setup-1.png" width="680" height="500" alt="Astra Max Setup welcome screen with a Next and Cancel button." loading="lazy">
-            </div>
-            <figcaption><span>01</span> Welcome</figcaption>
-          </figure>
-          <figure class="setup-step">
-            <div class="shot-frame">
-              <img src="assets/setup-2.png" width="680" height="500" alt="Astra Max Setup destination folder screen with a Browse button." loading="lazy">
-            </div>
-            <figcaption><span>02</span> Destination</figcaption>
-          </figure>
-          <figure class="setup-step">
-            <div class="shot-frame">
-              <img src="assets/setup-3.png" width="680" height="500" alt="Astra Max Setup component selection screen with an Install button." loading="lazy">
-            </div>
-            <figcaption><span>03</span> Components</figcaption>
-          </figure>
-        </div>
-      </div>
-    </section>
-
     <section class="section" id="download">
       <div class="wrap">
         <div class="download-card">
@@ -397,6 +369,32 @@
       <p class="fineprint">Version 1.4.1 · Not affiliated with Microsoft, AME Wizard or any game publisher. Game names belong to their owners. <span id="year"></span></p>
     </div>
   </footer>
+  </div>
+
+  <section class="playbook-view" id="playbook-view" hidden aria-label="The Astra Max playbook">
+    <header class="pb-header">
+      <div class="wrap pb-header-inner">
+        <button class="pb-back" id="close-playbook" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+          Back to site
+        </button>
+        <span class="pb-brand">ASTRA <strong>MAX</strong></span>
+        <a class="nav-cta" href="https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.4.1.apbx">Download 1.4.1</a>
+      </div>
+    </header>
+
+    <div class="wrap pb-body">
+      <div class="pb-intro">
+        <p class="kicker">The wizard</p>
+        <h1>The playbook.</h1>
+        <p class="pb-lede">All 36 pages in the order AME Wizard shows them. Every entry is a checkbox or radio button on a page you can read before anything runs — nothing is applied silently.</p>
+      </div>
+
+      <div class="pb-pages" id="pb-pages"></div>
+
+      <p class="pb-footnote">Astra Max 1.4.1 · 36 pages · the page list mirrors <code>playbook.conf</code> in the repository.</p>
+    </div>
+  </section>
 
   <script src="app.js"></script>
 </body>
