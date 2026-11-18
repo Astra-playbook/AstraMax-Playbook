@@ -36,6 +36,9 @@ actions:
   # Optional per-user privacy and nags
   - !task: {path: 'Tasks\extra-privacy.yml'}
 
+  # Astra capture, display, network and search extras
+  - !task: {path: 'Tasks\astra-extras.yml'}
+
   # Core parking and interrupt handling
   - !writeStatus: {status: 'Configuring core parking', option: irq-balanced}
   - !task: {path: 'Tasks\power.yml', option: irq-balanced}
@@ -85,6 +88,10 @@ actions:
   # Astra app and the helper scripts it shares
   - !writeStatus: {status: 'Deploying Astra', option: install-astra-tweaks}
   - !task: {path: 'Tasks\astra-app.yml', option: install-astra-tweaks}
+
+  # StartAllBack install shortcut (paid add-on, never installed silently)
+  - !writeStatus: {status: 'Adding the StartAllBack shortcut', option: install-startallback}
+  - !task: {path: 'Tasks\startallback.yml', option: install-startallback}
 
   # NVIDIA app and Control Panel download shortcuts (Store-free recovery)
   - !writeStatus: {status: 'Adding NVIDIA download shortcuts', option: install-nvidia-tools}

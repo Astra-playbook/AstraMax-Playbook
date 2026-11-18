@@ -37,6 +37,14 @@ param(
     [ValidateSet('Keep', 'On', 'Off')] [string]$KeyboardRepeat = 'Keep',
     [ValidateSet('Keep', 'On', 'Off')] [string]$AudioDucking = 'Keep',
     [ValidateSet('Keep', 'On', 'Off')] [string]$RestartApps = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$GameDvr = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$FullscreenOpt = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$Mpo = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$QosBandwidth = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$SearchLocal = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$CloudSearch = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$Recall = 'Keep',
+    [ValidateSet('Keep', 'On', 'Off')] [string]$Widgets = 'Keep',
     [switch]$AllOff
 )
 
@@ -51,6 +59,8 @@ if ($AllOff) {
     $OnlineSpeech = 'Off'; $InkTyping = 'Off'; $LanguageList = 'Off'; $TailoredExperiences = 'Off'
     $HiddenFiles = 'Off'; $FullPath = 'Off'; $TaskbarSmallIcons = 'Off'; $HoverDelay = 'Off'
     $KeyboardRepeat = 'Off'; $AudioDucking = 'Off'; $RestartApps = 'Off'
+    $GameDvr = 'Off'; $FullscreenOpt = 'Off'; $Mpo = 'Off'; $QosBandwidth = 'Off'
+    $SearchLocal = 'Off'; $CloudSearch = 'Off'; $Recall = 'Off'; $Widgets = 'Off'
 }
 
 $log = New-Object System.Collections.Generic.List[string]
@@ -470,6 +480,112 @@ if ($RestartApps -ne 'Keep') {
         Remove-ItemProperty -Path $winlogon -Name 'RestartApps' -Force -ErrorAction SilentlyContinue
         $log.Add('sign-in: Windows default app restart behaviour')
     }
+}
+
+# --- Xbox Game DVR background recording ------------------------------------------
+if ($GameDvr -ne 'Keep') {
+    $capture = 'HKCU:\System\GameConfigStore'
+    $dvr = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR'
+    $policy = 'HKLM:\Software\Policies\Microsoft\Windows\GameDVR'
+    if ($GameDvr -eq 'On') {
+        Set-Dword $capture 'GameDVR_Enabled' 0
+        Set-Dword $dvr 'AppCaptureEnabled' 0
+        if ($isAdmin) { Set-Dword $policy 'AllowGameDVR' 0 }
+        $log.Add('game dvr: background recording off (restart the game; manual Game Bar captures still work)')
+    }
+    else {
+        Set-Dword $capture 'GameDVR_Enabled' 1
+        Set-Dword $dvr 'AppCaptureEnabled' 1
+        if ($isAdmin) { Remove-ItemProperty -Path $policy -Name 'AllowGameDVR' -Force -ErrorAction SilentlyContinue }
+        $log.Add('game dvr: Windows default (background recording available)')
+    }
+}
+
+# --- fullscreen optimizations ------------------------------------------------------
+if ($FullscreenOpt -ne 'Keep') {
+    $gcs = 'HKCU:\System\GameConfigStore'
+    $values = if ($FullscreenOpt -eq 'On') {
+        @{ GameDVR_FSEBehaviorMode = 2; GameDVR_HonorUserFSEBehaviorMode = 1; GameDVR_DXGIHonorFSEWindowsCompatible = 1; GameDVR_EFSEFeatureFlags = 0 }
+    }
+    else {
+        @{ GameDVR_FSEBehaviorMode = 0; GameDVR_HonorUserFSEBehaviorMode = 0; GameDVR_DXGIHonorFSEWindowsCompatible = 0; GameDVR_EFSEFeatureFlags = 0 }
+    }
+    foreach ($name in $values.Keys) { Set-Dword $gcs $name $values[$name] }
+    $log.Add($(if ($FullscreenOpt -eq 'On') { 'fullscreen optimizations: off (true exclusive fullscreen; some overlays and alt-tab behave differently)' } else { 'fullscreen optimizations: Windows default' }))
+}
+
+# --- multiplane overlay (MPO) ------------------------------------------------------
+if ($Mpo -ne 'Keep') {
+    if (-not $isAdmin) { $log.Add('mpo: needs an elevated PowerShell') }
+    else {
+        $dwm = 'HKLM:\SOFTWARE\Microsoft\Windows\Dwm'
+        if ($Mpo -eq 'On') {
+            Set-Dword $dwm 'OverlayTestMode' 5
+            $log.Add('mpo: multiplane overlay disabled (sign out to finish; fixes flicker on some GPUs, can cost a little desktop smoothness)')
+        }
+        else {
+            Remove-ItemProperty -Path $dwm -Name 'OverlayTestMode' -Force -ErrorAction SilentlyContinue
+            $log.Add('mpo: Windows default (sign out to finish)')
+        }
+    }
+}
+
+# --- QoS reserved bandwidth --------------------------------------------------------
+if ($QosBandwidth -ne 'Keep') {
+    if (-not $isAdmin) { $log.Add('qos: needs an elevated PowerShell') }
+    else {
+        $psched = 'HKLM:\Software\Policies\Microsoft\Windows\Psched'
+        if ($QosBandwidth -eq 'On') {
+            Set-Dword $psched 'NonBestEffortLimit' 0
+            $log.Add('qos: reserved bandwidth released to applications')
+        }
+        else {
+            Remove-ItemProperty -Path $psched -Name 'NonBestEffortLimit' -Force -ErrorAction SilentlyContinue
+            $log.Add('qos: Windows default reserved bandwidth')
+        }
+    }
+}
+
+# --- Start search: local results only ----------------------------------------------
+if ($SearchLocal -ne 'Keep') {
+    $search = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search'
+    Set-Dword $search 'BingSearchEnabled' $(if ($SearchLocal -eq 'On') { 0 } else { 1 })
+    $log.Add($(if ($SearchLocal -eq 'On') { 'search: local results only, no Bing web results (sign out to finish)' } else { 'search: Windows default web results' }))
+}
+
+# --- Start search: cloud content ---------------------------------------------------
+if ($CloudSearch -ne 'Keep') {
+    $settings = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings'
+    if ($CloudSearch -eq 'On') {
+        Set-Dword $settings 'IsMSACloudSearchEnabled' 0
+        Set-Dword $settings 'IsAADCloudSearchEnabled' 0
+        $log.Add('search: cloud content from Microsoft and work accounts off')
+    }
+    else {
+        foreach ($name in 'IsMSACloudSearchEnabled', 'IsAADCloudSearchEnabled') {
+            Remove-ItemProperty -Path $settings -Name $name -Force -ErrorAction SilentlyContinue
+        }
+        $log.Add('search: Windows default cloud content')
+    }
+}
+
+# --- Recall snapshots --------------------------------------------------------------
+if ($Recall -ne 'Keep') {
+    $ai = 'HKCU:\Software\Policies\Microsoft\Windows\WindowsAI'
+    if ($Recall -eq 'On') {
+        Set-Dword $ai 'DisableAIDataAnalysis' 1
+        $log.Add('recall: snapshots disabled (Copilot+ PCs; no effect on other hardware)')
+    }
+    else {
+        Remove-ItemProperty -Path $ai -Name 'DisableAIDataAnalysis' -Force -ErrorAction SilentlyContinue
+        $log.Add('recall: Windows default')
+    }
+}
+
+# --- Widgets board button ----------------------------------------------------------
+if ($Widgets -ne 'Keep') {
+    Set-Dword $adv 'TaskbarDa' $(if ($Widgets -eq 'On') { 0 } else { 1 })
+    $log.Add($(if ($Widgets -eq 'On') { 'widgets: taskbar button hidden (sign out or restart Explorer to finish)' } else { 'widgets: taskbar button shown' }))
 }
 
 if (-not $log.Count) { $log.Add('nothing selected') }

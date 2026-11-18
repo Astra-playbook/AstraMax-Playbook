@@ -338,6 +338,31 @@ const PAGES = [
     prompt: "Virtualization-Based Security.",
     options: ["Keep VBS enabled (required by some anti-cheats)", "Disable VBS (performance mode, no Vanguard/FACEIT)"],
   },
+  {
+    n: 37, title: "Capture and display extras",
+    prompt: "Capture, display and network toggles ported from the Astra app, off by default. Game DVR stops background recording (manual Game Bar captures still work). Fullscreen optimizations off forces exclusive fullscreen; some overlays and alt-tab behaviour change. MPO off fixes flicker on some GPUs but can cost a little desktop smoothness and needs a sign-out. Releasing QoS reserved bandwidth removes the policy limit. Every value Astra writes is reproduced exactly and undone by Restore.ps1 -QoL.",
+    options: [
+      "Turn off Xbox Game DVR background recording",
+      "Turn off fullscreen optimizations globally",
+      "Disable the multiplane overlay (MPO)",
+      "Release QoS reserved bandwidth",
+    ],
+  },
+  {
+    n: 38, title: "Search extras",
+    prompt: "Start search and shell toggles, off by default. Keeping search local stops Bing web results; turning cloud search off stops Microsoft-account and work-account suggestions. Both make Start search lighter without touching the local index. Recall off blocks snapshots on Copilot+ PCs (no effect elsewhere). Hiding the Widgets button removes it from the taskbar. Reversible from Restore.ps1 -QoL.",
+    options: [
+      "Keep Start search local (no Bing web results)",
+      "Turn off Start cloud search suggestions",
+      "Turn off Recall snapshots (Copilot+ PCs)",
+      "Hide the Widgets button",
+    ],
+  },
+  {
+    n: 39, title: "StartAllBack",
+    prompt: "StartAllBack is a paid third-party Start menu and taskbar add-on with a per-user license (startallback.com). Astra does not install it silently and does not cover it in Restore.ps1. When the setup is bundled in this build it is copied to C:\\AstraMax\\Tools and an install shortcut is added to the desktop and Start menu; otherwise the shortcut opens the official page. It changes the shell, not the search index: use the search options above to lighten Start search itself.",
+    options: ["StartAllBack — stage the setup and add an install shortcut (paid add-on)"],
+  },
 ];
 
 const GROUPS = [
@@ -350,6 +375,7 @@ const GROUPS = [
   { title: "Drivers, CPU and GPU", from: 17, to: 21 },
   { title: "Shell and quality of life", from: 22, to: 32 },
   { title: "Security", from: 33, to: 36 },
+  { title: "Astra extras", from: 37, to: 39 },
 ];
 
 const pad = (n) => String(n).padStart(2, "0");

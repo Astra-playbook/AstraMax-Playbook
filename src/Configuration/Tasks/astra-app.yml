@@ -7,7 +7,7 @@ actions:
       $dir = 'C:\AstraMax'
       $appDir = Join-Path $dir 'AstraTweaks'
       New-Item -ItemType Directory -Path $appDir -Force | Out-Null
-      foreach ($file in 'Verify.ps1', 'Restore.ps1', 'Cleanup.ps1', 'Network.ps1', 'Tweaks.ps1', 'QoL.ps1', 'Security.ps1', 'Debloat.ps1', 'NvidiaTools.ps1') {
+      foreach ($file in 'Verify.ps1', 'Restore.ps1', 'Cleanup.ps1', 'Network.ps1', 'Tweaks.ps1', 'QoL.ps1', 'Security.ps1', 'Debloat.ps1', 'NvidiaTools.ps1', 'StartAllBack.ps1') {
           Copy-Item -LiteralPath (Join-Path '.' $file) -Destination $dir -Force
       }
       Copy-Item -LiteralPath '.\AstraTweaks\Astra.exe' -Destination (Join-Path $appDir 'Astra.exe') -Force

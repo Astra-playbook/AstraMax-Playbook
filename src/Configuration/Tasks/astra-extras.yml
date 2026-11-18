@@ -1,0 +1,84 @@
+title: Astra extras
+description: Capture, display, network and Start search toggles ported from the Astra app, all reversible from Restore.ps1 -QoL
+actions:
+  - !writeStatus: {status: 'Applying Astra capture and display extras'}
+
+  - !writeStatus: {status: 'Turning off Game DVR background recording', option: extra-game-dvr-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -GameDvr On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-game-dvr-off
+
+  - !writeStatus: {status: 'Turning off fullscreen optimizations', option: extra-fso-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -FullscreenOpt On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-fso-off
+
+  - !writeStatus: {status: 'Disabling the multiplane overlay', option: extra-mpo-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Mpo On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-mpo-off
+
+  - !writeStatus: {status: 'Releasing QoS reserved bandwidth', option: extra-qos-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -QosBandwidth On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-qos-off
+
+  - !writeStatus: {status: 'Keeping Start search local', option: extra-search-local}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -SearchLocal On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-search-local
+
+  - !writeStatus: {status: 'Turning off Start cloud search', option: extra-cloud-search-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -CloudSearch On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-cloud-search-off
+
+  - !writeStatus: {status: 'Turning off Recall snapshots', option: extra-recall-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Recall On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-recall-off
+
+  - !writeStatus: {status: 'Hiding the Widgets button', option: extra-widgets-off}
+  - !powerShell:
+    command: |
+      & '.\QoL.ps1' -Widgets On
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: extra-widgets-off

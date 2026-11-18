@@ -21,23 +21,26 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Optional extras** — USB power saving off, OneDrive off, Edge background off, driver updates blocked
 - **Defender and VBS choices** — explicit, both default to disabled in this build; the safer choice and the anti-cheat trade-off are called out in the UI
 - **Security hardening** — a checked-by-default page turns SmartScreen on, disables LLMNR and disables AutoRun/AutoPlay per user, with previous values snapshotted under `ProgramData\AstraMax\Security`; a separate unchecked page turns SmartScreen and Security Center alerts off
+- **Astra capture and display extras** — the app's Game DVR, fullscreen-optimizations, MPO and QoS values reproduced exactly, all off by default and reversible from `Restore.ps1 -QoL`
+- **Astra search extras** — local-only Start search, cloud search suggestions off, Recall snapshots off and the Widgets button hidden, off by default
+- **StartAllBack** — optional shortcut/staging page for the paid third-party shell add-on; the playbook never installs it silently and the installer is not committed (see the licensing note below)
 
-Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.4.1.
+Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.5.0.
 
 **Website:** [astra-playbook.github.io/AstraMax-Playbook](https://astra-playbook.github.io/AstraMax-Playbook/)
 
 ## Download
 
-- **[Astra-1.4.1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.4.1.apbx)** - 340,645,970 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
-- **SHA256:** `9ABD6F8D22CA65D280A450BE63DDCDCEEB6DF2F7465E872D5B1022173F4722B5`
+- **[Astra-1.5.0.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.5.0.apbx)** - 340,648,370 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
+- **SHA256:** `56BDEA56AF2532D067AC48DEBF03F2C0FAB60310EE4B0234E54F7B45C3040A7D`
 
-The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.4.1.apbx -Algorithm SHA256` before applying.
+The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.5.0.apbx -Algorithm SHA256` before applying.
 
 ## Project layout
 
 ```
 AstraMax-Playbook/
-├─ Astra-1.4.1.apbx                     # built artifact
+├─ Astra-1.5.0.apbx                     # built artifact
 ├─ src/
 │  ├─ playbook.conf                     # metadata, pages, options, requirements
 │  ├─ playbook.png
@@ -67,20 +70,23 @@ AstraMax-Playbook/
 │  │     ├─ harden.yml                  # SmartScreen on, LLMNR off, AutoRun off (snapshotted)
 │  │     ├─ security.yml                # optional SmartScreen/alerts off, Defender and VBS choices
 │  │     ├─ extra-privacy.yml           # Spotlight, setup prompts, recent apps, cloud clipboard
+│  │     ├─ astra-extras.yml            # Game DVR, FSO, MPO, QoS, search, Recall, Widgets
 │  │     ├─ astra-app.yml               # deploys the Astra app, helpers and shortcuts
+│  │     ├─ startallback.yml            # stages the paid add-on and adds an install shortcut
 │  │     ├─ nvidia.yml                  # desktop/Start Menu NVIDIA App and driver shortcuts
 │  │     ├─ qol.yml                     # Explorer/taskbar/Start preferences
 │  │     └─ tool.yml
 │  └─ Executables/
 │     ├─ Astra-Max-Setup.exe
 │     ├─ AstraTweaks/Astra.exe          # bundled Astra PC app (v1.6.4)
-│     ├─ Executables/Redist/            # bundled offline runtimes (DirectX, VC++, .NET 8)
+│     ├─ Redist/                        # bundled offline runtimes (DirectX, VC++, .NET 8)
 │     ├─ Verify.ps1                     # read-only state report
 │     ├─ Restore.ps1                    # undo power, interrupts, DNS/DoH, Steam, capture, tweaks, QoL
 │     ├─ Cleanup.ps1                    # cache and temp cleanup
 │     ├─ Network.ps1                    # DNS + DoH helper used by tasks
 │     ├─ Tweaks.ps1                     # mouse, throttling, plan, startup, MMCSS, latency toggles
-│     ├─ QoL.ps1                        # Explorer, taskbar, clock, Start, clipboard and nag toggles
+│     ├─ QoL.ps1                        # Explorer, taskbar, Start, search and capture extras
+│     ├─ StartAllBack.ps1               # stages the optional add-on and adds the install shortcut
 │     ├─ Security.ps1                   # SmartScreen, LLMNR and AutoRun hardening with snapshots
 │     ├─ Debloat.ps1                    # four-tier app removal, service tiers with snapshots, Insane optional-feature strip, status, exact restore
 │     ├─ GameProfiles.ps1               # detect, patch, launch options
@@ -135,6 +141,9 @@ Option names in `playbook.conf` gate actions in YAML through `option:`. Tier fil
 34. Disable security (checkboxes, unchecked: SmartScreen off, Security Center alerts off)
 35. Defender (radio, disabled by default)
 36. VBS (radio, disabled by default)
+37. Capture and display extras (checkboxes, unchecked: Game DVR off, fullscreen optimizations off, MPO off, QoS reserved bandwidth released)
+38. Search extras (checkboxes, unchecked: local-only Start search, cloud search off, Recall off, Widgets button hidden)
+39. StartAllBack (checkbox, unchecked: stages the setup when bundled and adds an install shortcut; paid add-on, never installed silently)
 
 Every radio page sets `IsRequired="true"` and `DefaultOption`, which AME requires for ISO
 injection. Current AME builds also enforce layout limits: a page with a `TopLine` or
@@ -492,6 +501,43 @@ listed under `Gaming shell extras` in `Verify.ps1`. Do not disable the accessibi
 machine where someone relies on Sticky Keys, Filter Keys or Toggle Keys. The Edge policies hide shell
 surfaces only; they do not disable the browser engine or WebView2 used by games and launchers.
 
+### Astra extras
+
+Eight toggles on two unchecked pages (37-38), taken from the values the Astra app itself stores in
+`%LOCALAPPDATA%\AstraPC\State\system-tweaks.json`. All are applied by `QoL.ps1` and reversed by
+`QoL.ps1 -AllOff` / `Restore.ps1 -QoL`.
+
+| Option | Value |
+| --- | --- |
+| Game DVR background recording off | `HKCU\System\GameConfigStore` `GameDVR_Enabled=0`, `HKCU\...\GameDVR` `AppCaptureEnabled=0`, `HKLM\Software\Policies\Microsoft\Windows\GameDVR` `AllowGameDVR=0`; OFF writes `1`, `1` and deletes the policy |
+| Fullscreen optimizations off | `HKCU\System\GameConfigStore` `GameDVR_FSEBehaviorMode=2`, `GameDVR_HonorUserFSEBehaviorMode=1`, `GameDVR_DXGIHonorFSEWindowsCompatible=1`, `GameDVR_EFSEFeatureFlags=0`; OFF writes `0` to all four |
+| MPO off | `HKLM\SOFTWARE\Microsoft\Windows\Dwm` `OverlayTestMode=5`; OFF deletes it; sign out to finish |
+| QoS reserved bandwidth released | `HKLM\Software\Policies\Microsoft\Windows\Psched` `NonBestEffortLimit=0`; OFF deletes the policy |
+| Local-only search | `HKCU\...\Search` `BingSearchEnabled=0`; OFF writes `1` |
+| Cloud search off | `HKCU\...\SearchSettings` `IsMSACloudSearchEnabled=0`, `IsAADCloudSearchEnabled=0`; OFF deletes both |
+| Recall off | `HKCU\Software\Policies\Microsoft\Windows\WindowsAI` `DisableAIDataAnalysis=1`; OFF deletes it; Copilot+ hardware only |
+| Widgets button hidden | `HKCU\...\Explorer\Advanced` `TaskbarDa=0`; OFF writes `1` |
+
+Game DVR off stops background recording; manual Game Bar captures still work. Fullscreen optimizations
+off changes overlay and alt-tab behaviour in some games, and MPO off can cost a little desktop
+smoothness, so both stay unchecked. The two search options are the ones that make Start search
+lighter: they stop Bing and cloud suggestions while leaving the local index alone.
+
+### StartAllBack (optional, paid)
+
+StartAllBack is commercial, per-user licensed software from
+[startallback.com](https://www.startallback.com/). It is not bundled in the public repository or the
+published release, it is not installed silently, and `Restore.ps1` does not cover it. Page 39 stages
+the setup when it is present in the build, writes `C:\AstraMax\Tools\StartAllBack.txt`, and adds an
+"Install StartAllBack" shortcut to the desktop and Start menu; without the setup the same shortcut
+opens the official page.
+
+To include it in a local build, place your licensed `StartAllBack_setup.exe` in `src/Executables/`
+before running `tools/build.ps1`. The file is gitignored and the build prints a redistribution
+warning. Do not publish a build that contains it unless your license allows redistribution.
+StartAllBack changes the Start menu and taskbar, not the search index; use the search extras above to
+lighten Start search itself.
+
 ## Network stack presets
 
 Page 7 defaults to **Balanced**.
@@ -707,9 +753,9 @@ powershell -ExecutionPolicy Bypass -File tools/validate.ps1
 powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
 
-`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.4.1 artifact built from this tree is `Astra-1.4.1.apbx`, SHA256 `9ABD6F8D22CA65D280A450BE63DDCDCEEB6DF2F7465E872D5B1022173F4722B5`. The build refuses an archive that still contains the retired `PostInstall` menu.
+`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.5.0 artifact built from this tree is `Astra-1.5.0.apbx`, SHA256 `56BDEA56AF2532D067AC48DEBF03F2C0FAB60310EE4B0234E54F7B45C3040A7D`. The build refuses an archive that still contains the retired `PostInstall` menu.
 
-The repository tracks `Astra-1.4.1.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
+The repository tracks `Astra-1.5.0.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
 
 The `.apbx` must be a **7z archive, AES-256 encrypted with password `malte`, with the file list encrypted** (`-mhe=on`). That is AME Wizard's convention; a plain zip is rejected at load with *"Playbook must be encrypted using 'malte' as the password."* `build.ps1` does this through the portable `tools/7zr.exe` (download it from https://www.7-zip.org/a/7zr.exe if missing) using the equivalent of:
 
@@ -722,22 +768,22 @@ The script then re-lists the archive with the password, confirms `playbook.conf`
 ## Apply
 
 1. Download AME Wizard Beta and a clean Windows 11 ISO.
-2. Drag the ISO into AME Wizard, then drop `Astra-1.4.1.apbx` in.
+2. Drag the ISO into AME Wizard, then drop `Astra-1.5.0.apbx` in.
 3. Pick preset, debloat tier, service tier, components, power/interrupts, network, DNS/DoH, game profiles/extras, input/power, quality-of-life and latency extras, Defender and VBS options.
 4. Finish, write the image to USB (Rufus or built-in), and install — or apply to the running system if you drop the `FreshInstall` requirement.
 
 If AME still refuses the file at load, check the message. `Playbook must be encrypted using 'malte' as the password` means the archive was repacked (for example re-zipped or re-saved by an editor) and lost its 7z/AES encryption — rebuild it with `tools/build.ps1`. A generic "invalid playbook" with this archive usually means the AME Beta build is older than the playbook schema; the public Atlas/NOVA playbooks are the reference for the currently supported action names.
 
-## Verification status for 1.4.1
+## Verification status for 1.5.0
 
-1.4.1 finalizes the Astra branding: the wizard labels read Astra Max and Astra app, and the helper is described as installing Astra Max from its bundled NSIS installer. It keeps the 1.4.0 changes, which removed the retired post-install menu and made Astra the only control panel. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys; the catalog, GUI and post-install assertions were removed with the tool. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe` and `AstraTweaks\Astra.exe` inside, no `PostInstall` entry, unreadable headers without the password, and a clean integrity test.
+1.5.0 adds two Astra extras pages (37-38) with eight toggles whose registry values were read from the Astra app's own backup state in `%LOCALAPPDATA%\AstraPC\State\system-tweaks.json`, plus a StartAllBack staging page (39). It keeps 1.4.1's Astra branding and the 1.4.0 removal of the retired post-install menu. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold across all 39 pages, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys, including both directions of all eight new toggles and static checks that the StartAllBack helper never runs an installer. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe`, `AstraTweaks\Astra.exe` and the new tasks inside, no `PostInstall` entry, no StartAllBack installer in the public build, unreadable headers without the password, and a clean integrity test.
 
 The screenshots on the site were captured from Astra 1.6.4 running on Windows 11 on this PC (Dashboard, Tuning, Games, Power presets, Cleaner) and from the bundled Astra Max Setup before its Install step. No tweak was applied and the setup was cancelled before installing.
 
-Not executed for 1.4.1: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, game benchmarks and any claim about FPS. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
+Not executed for 1.5.0: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, the StartAllBack setup (never run, and not included in the public artifact), game benchmarks and any claim about FPS. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
 ## Smoke-test checklist (VM first)
 
-1. Wizard shows 36 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled.
+1. Wizard shows 39 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled.
 2. Light run changes registry only; no services change.
 3. Recommended disables `DiagTrack`/`SysMain`; Extreme adds `WSearch`/`Spooler`; Insane adds `DoSvc`/`WpnService`.
 4. Desktop wallpaper changes to the selected Astra theme and survives a sign-out; the file exists at `C:\Windows\Web\Wallpaper\Astra\astra-wallpaper.png`.
@@ -762,6 +808,9 @@ Not executed for 1.4.1: applying the archive through AME on a clean image or VM,
 23. Gaming latency extras (unchecked by default): PCIe ASPM off and disk idle off write AC index `0` and leave DC alone; `HardwareTweaks.ps1 -Mode Off` restores the saved indices; dynamic tick needs a reboot.
 24. NVIDIA tools page (unchecked by default): ticking it adds the two desktop shortcuts; `NvidiaTools.ps1 -Mode Status` prints the diagnosis; no NVIDIA package is removed by debloat.
 25. Security hardening page (all three ticked by default): `SmartScreenEnabled='Warn'`, policy `EnableSmartScreen=1`, `EnableMulticast=0` and `NoDriveTypeAutoRun=255` are written, with one snapshot per item under `ProgramData\AstraMax\Security`. `Security.ps1 -AllOff` or `Restore.ps1 -Security` reverses them.
+26. Astra capture/display extras (unchecked): `GameDVR_Enabled=0`, `AppCaptureEnabled=0`, `AllowGameDVR=0`, the four `GameDVR_FSE*` values, `OverlayTestMode=5` and `NonBestEffortLimit=0` are written; `QoL.ps1 -AllOff` restores the Astra defaults (`1`/values deleted).
+27. Astra search extras (unchecked): `BingSearchEnabled=0`, both `Is*CloudSearchEnabled=0`, `DisableAIDataAnalysis=1` and `TaskbarDa=0` are written; sign out and confirm Start shows no web results and the Widgets button is gone.
+28. StartAllBack page (unchecked): ticking it adds "Install StartAllBack" to the desktop and Start menu and writes `C:\AstraMax\Tools\StartAllBack.txt`; nothing is installed or executed by the playbook.
 
 Machine-wide changes run as `system`. Per-user values (wallpaper, shortcuts, game configs) run as the
 signed-in user through `currentUserElevated`, and `!registryValue` `HKCU` writes land in every loaded
@@ -779,6 +828,8 @@ backups). From a prompt:
 - **Quality of life:** delete `HKCU\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}` for the classic menu; set `TaskbarAl=1`, `ShowSecondsInSystemClock=0`, `LaunchTo=2`, `AppsUseLightTheme=1`, `Start_IrisRecommendations=1`, `LongPathsEnabled=0` and `EnableClipboardHistory=0` for the rest; set `GlobalUserDisabled=0`, delete `BackgroundAppGlobalToggle` and `ShowSyncProviderNotifications`, set `Win32PrioritySeparation=2`, and delete `NoWindowMinimizingShortcuts` for the optional toggles. `Restore.ps1 -QoL` does all of it.
 - **Latency extras:** set `GlobalTimerResolutionRequests=0`, re-enable adapter power saving in Device Manager, run `powercfg` `IDLEDISABLE=0` on AC/DC, and `Enable-MMAgent -MemoryCompression`. The gaming extras use `HardwareTweaks.ps1 -Feature PciePower|DiskIdle|DynamicTick -Mode Off` (each restores its saved index or BCD value); reboot after restoring dynamic tick.
 - **Gaming shell extras:** set `ToastEnabled=1`, `MenuShowDelay='400'`, the accessibility `Flags` back to `510`/`126`/`58` with `WinEnterLaunchEnabled=1`, `PenWorkspaceButtonDesiredVisibility=1`, and delete `HubsSidebarEnabled`, `EdgeShoppingAssistantEnabled`, `WebWidgetAllowed` and `HideFirstRunExperience`. `QoL.ps1 -AllOff` covers all five.
+- **Astra extras:** set `GameDVR_Enabled=1`, `AppCaptureEnabled=1`, zero the four `GameDVR_FSE*` values, delete `AllowGameDVR`, `OverlayTestMode`, `NonBestEffortLimit`, `IsMSACloudSearchEnabled`, `IsAADCloudSearchEnabled` and `DisableAIDataAnalysis`, set `BingSearchEnabled=1` and `TaskbarDa=1`. `Restore.ps1 -QoL` does all of it.
+- **StartAllBack:** the playbook never installed it. If you installed it from the shortcut, uninstall it from Settings → Apps, then sign out.
 - **Windows extras:** delete `StartupDelayInMSec`; set `IsDynamicSearchBoxEnabled=1`; set `SubscribedContent-338387Enabled`, `-338388Enabled`, `-310093Enabled`, `ShowRecent` and `ShowFrequent` to `1`. `Tweaks.ps1 -AllOff` covers all four.
 - **Debloat:** `Debloat.ps1 -Restore` restores each service's exact snapshot startup type and prints the reinstall list; `wsreset -i` brings the Store back (Extreme). Apps are reinstalled from the Store, `winget`, or the exact package names in `C:\AstraMax\Debloat\removed.json` — for another account, install once and it becomes available to everyone. Removed provisioned copies are not restored automatically; a clean image is the only full reset.
 - **Services:** `Debloat.ps1 -Restore` replays `service-state.json`: Automatic, delayed Automatic, Manual and Disabled are restored exactly, and services that were running are started again. It also restores the 10 per-user templates from `user-service-state.json` (sign out/in to start them) and the previous `SvcHostSplitThresholdInKB` value from `kernel-state.json` (reboot to apply), then re-enables any optional feature recorded in `feature-state.json`. Service cache/report folders and stale per-user keys deleted by the service tier are not restored; Windows rebuilds the caches and recreates instance keys only when the service runs again. A single service can also be set back in `services.msc`.

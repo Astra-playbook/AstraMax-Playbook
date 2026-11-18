@@ -18,6 +18,8 @@ $required = @(
     'playbook.png',
     'Configuration\main.yml',
     'Configuration\Tasks\astra-app.yml',
+    'Configuration\Tasks\astra-extras.yml',
+    'Configuration\Tasks\startallback.yml',
     'Configuration\Tasks\debloat.yml',
     'Configuration\Tasks\qol.yml',
     'Configuration\Tasks\services.yml',
@@ -50,6 +52,7 @@ $required = @(
     'Executables\Redist\directx_Jun2010_redist.exe',
     'Executables\Redist\windowsdesktop-runtime-8.0.34-win-x64.exe',
     'Executables\Security.ps1',
+    'Executables\StartAllBack.ps1',
     'Configuration\Tasks\nvidia.yml',
     'Configuration\Tasks\extra-privacy.yml',
     'Configuration\Tasks\harden.yml'
@@ -64,6 +67,11 @@ foreach ($rel in $required) {
 
 if (-not (Test-Path $sevenZip)) {
     throw "7zr.exe not found: $sevenZip. Download the standalone console from https://www.7-zip.org/a/7zr.exe"
+}
+
+$startAllBack = Join-Path $src 'Executables\StartAllBack_setup.exe'
+if (Test-Path $startAllBack) {
+    Write-Warning 'StartAllBack_setup.exe is being bundled. It is commercial, per-user licensed third-party software; redistribution is your responsibility. It is gitignored, so it is not committed to the public repository.'
 }
 
 if (Test-Path $Output) {

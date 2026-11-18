@@ -1,0 +1,12 @@
+title: StartAllBack
+description: Stages the optional StartAllBack setup and adds an install shortcut; nothing is installed silently
+actions:
+  - !writeStatus: {status: 'Adding the StartAllBack shortcut', option: install-startallback}
+  - !powerShell:
+    command: |
+      & '.\StartAllBack.ps1'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    ignoreErrors: true
+    option: install-startallback

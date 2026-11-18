@@ -22,7 +22,7 @@ function Import-Functions([string]$File, [string[]]$Names) {
 try {
     $env:LOCALAPPDATA = $temp
     $qol = Get-Content (Join-Path $src 'QoL.ps1') -Raw
-    $qol = $qol.Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', ($registry + '\Theme')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', ($registry + '\Explorer')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications', ($registry + '\Bg')).Replace('HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl', ($registry + '\Priority')).Replace('HKCU:\Control Panel\Desktop\WindowMetrics', ($registry + '\Metrics')).Replace('HKCU:\Control Panel\Desktop', ($registry + '\Desktop')).Replace('HKCU:\Control Panel\Accessibility', ($registry + '\A11y')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications', ($registry + '\Push')).Replace('HKCU:\Software\Microsoft\Narrator\NoRoam', ($registry + '\Narrator')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\PenWorkspace', ($registry + '\Pen')).Replace('HKCU:\Software\Policies\Microsoft\Edge', ($registry + '\Edge')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', ($registry + '\CDM')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement', ($registry + '\UPE')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance', ($registry + '\Toast')).Replace('HKCU:\Software\Microsoft\Clipboard', ($registry + '\Clip')).Replace('HKCU:\Software\Microsoft\GameBar', ($registry + '\GameBar')).Replace('HKCU:\Software\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy', ($registry + '\Speech')).Replace('HKCU:\Software\Microsoft\InputPersonalization', ($registry + '\Input')).Replace('HKCU:\Control Panel\International\User Profile', ($registry + '\Lang')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Privacy', ($registry + '\Privacy')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState', ($registry + '\Cabinet')).Replace('HKCU:\Control Panel\Keyboard', ($registry + '\Keyboard')).Replace('HKCU:\Software\Microsoft\Multimedia\Audio', ($registry + '\Audio')).Replace('HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon', ($registry + '\Winlogon'))
+    $qol = $qol.Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', ($registry + '\Theme')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', ($registry + '\Explorer')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications', ($registry + '\Bg')).Replace('HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl', ($registry + '\Priority')).Replace('HKCU:\Control Panel\Desktop\WindowMetrics', ($registry + '\Metrics')).Replace('HKCU:\Control Panel\Desktop', ($registry + '\Desktop')).Replace('HKCU:\Control Panel\Accessibility', ($registry + '\A11y')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\PushNotifications', ($registry + '\Push')).Replace('HKCU:\Software\Microsoft\Narrator\NoRoam', ($registry + '\Narrator')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\PenWorkspace', ($registry + '\Pen')).Replace('HKCU:\Software\Policies\Microsoft\Edge', ($registry + '\Edge')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', ($registry + '\CDM')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement', ($registry + '\UPE')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.SecurityAndMaintenance', ($registry + '\Toast')).Replace('HKCU:\Software\Microsoft\Clipboard', ($registry + '\Clip')).Replace('HKCU:\Software\Microsoft\GameBar', ($registry + '\GameBar')).Replace('HKCU:\Software\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy', ($registry + '\Speech')).Replace('HKCU:\Software\Microsoft\InputPersonalization', ($registry + '\Input')).Replace('HKCU:\Control Panel\International\User Profile', ($registry + '\Lang')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Privacy', ($registry + '\Privacy')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\CabinetState', ($registry + '\Cabinet')).Replace('HKCU:\Control Panel\Keyboard', ($registry + '\Keyboard')).Replace('HKCU:\Software\Microsoft\Multimedia\Audio', ($registry + '\Audio')).Replace('HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon', ($registry + '\Winlogon')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\SearchSettings', ($registry + '\SearchSettings')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\Search', ($registry + '\Search')).Replace('HKCU:\System\GameConfigStore', ($registry + '\Gcs')).Replace('HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR', ($registry + '\Dvr')).Replace('HKLM:\Software\Policies\Microsoft\Windows\GameDVR', ($registry + '\DvrPolicy')).Replace('HKLM:\SOFTWARE\Microsoft\Windows\Dwm', ($registry + '\Dwm')).Replace('HKLM:\Software\Policies\Microsoft\Windows\Psched', ($registry + '\Psched')).Replace('HKCU:\Software\Policies\Microsoft\Windows\WindowsAI', ($registry + '\WindowsAI'))
     New-Item ($registry + '\Theme') -Force | Out-Null
     Set-ItemProperty ($registry + '\Theme') 'Unrelated' 17 -Type DWord
     & ([scriptblock]::Create($qol)) -DarkMode On -EndTask On | Out-Null
@@ -109,6 +109,28 @@ try {
     Assert ($keyboard.KeyboardDelay -eq '1' -and $keyboard.KeyboardSpeed -eq '31') 'Keyboard toggle restores the normal delay'
     Assert ((Get-ItemProperty ($registry + '\Audio')).PSObject.Properties.Name -notcontains 'UserDuckingPreference') 'Audio toggle restores the default ducking'
     Assert ((Get-ItemProperty ($registry + '\Winlogon')).PSObject.Properties.Name -notcontains 'RestartApps') 'Restart-apps toggle restores the default'
+    & ([scriptblock]::Create($qol)) -GameDvr On -FullscreenOpt On -Mpo On -QosBandwidth On -SearchLocal On -CloudSearch On -Recall On -Widgets On | Out-Null
+    $gcs = Get-ItemProperty ($registry + '\Gcs')
+    Assert ($gcs.GameDVR_Enabled -eq 0 -and (Get-ItemProperty ($registry + '\Dvr')).AppCaptureEnabled -eq 0 -and (Get-ItemProperty ($registry + '\DvrPolicy')).AllowGameDVR -eq 0) 'Game DVR toggle disables capture, background recording and the policy'
+    Assert ($gcs.GameDVR_FSEBehaviorMode -eq 2 -and $gcs.GameDVR_HonorUserFSEBehaviorMode -eq 1 -and $gcs.GameDVR_DXGIHonorFSEWindowsCompatible -eq 1 -and $gcs.GameDVR_EFSEFeatureFlags -eq 0) 'Fullscreen optimizations toggle writes the four Astra values'
+    Assert ((Get-ItemProperty ($registry + '\Dwm')).OverlayTestMode -eq 5) 'MPO toggle writes OverlayTestMode 5'
+    Assert ((Get-ItemProperty ($registry + '\Psched')).NonBestEffortLimit -eq 0) 'QoS toggle releases the reserved bandwidth'
+    Assert ((Get-ItemProperty ($registry + '\Search')).BingSearchEnabled -eq 0) 'Local search toggle stops Bing results'
+    $searchSettings = Get-ItemProperty ($registry + '\SearchSettings')
+    Assert ($searchSettings.IsMSACloudSearchEnabled -eq 0 -and $searchSettings.IsAADCloudSearchEnabled -eq 0) 'Cloud search toggle writes both account values'
+    Assert ((Get-ItemProperty ($registry + '\WindowsAI')).DisableAIDataAnalysis -eq 1) 'Recall toggle disables snapshots'
+    Assert ((Get-ItemProperty ($registry + '\Explorer')).TaskbarDa -eq 0) 'Widgets toggle hides the taskbar button'
+    & ([scriptblock]::Create($qol)) -GameDvr Off -FullscreenOpt Off -Mpo Off -QosBandwidth Off -SearchLocal Off -CloudSearch Off -Recall Off -Widgets Off | Out-Null
+    $gcs = Get-ItemProperty ($registry + '\Gcs')
+    Assert ($gcs.GameDVR_Enabled -eq 1 -and (Get-ItemProperty ($registry + '\Dvr')).AppCaptureEnabled -eq 1 -and (Get-ItemProperty ($registry + '\DvrPolicy')).PSObject.Properties.Name -notcontains 'AllowGameDVR') 'Game DVR toggle restores capture and removes the policy'
+    Assert ($gcs.GameDVR_FSEBehaviorMode -eq 0 -and $gcs.GameDVR_HonorUserFSEBehaviorMode -eq 0 -and $gcs.GameDVR_DXGIHonorFSEWindowsCompatible -eq 0) 'Fullscreen optimizations toggle restores the defaults'
+    Assert ((Get-ItemProperty ($registry + '\Dwm')).PSObject.Properties.Name -notcontains 'OverlayTestMode') 'MPO toggle removes the override'
+    Assert ((Get-ItemProperty ($registry + '\Psched')).PSObject.Properties.Name -notcontains 'NonBestEffortLimit') 'QoS toggle removes the policy'
+    Assert ((Get-ItemProperty ($registry + '\Search')).BingSearchEnabled -eq 1) 'Local search toggle restores web results'
+    $searchSettings = Get-ItemProperty ($registry + '\SearchSettings')
+    Assert ($searchSettings.PSObject.Properties.Name -notcontains 'IsMSACloudSearchEnabled' -and $searchSettings.PSObject.Properties.Name -notcontains 'IsAADCloudSearchEnabled') 'Cloud search toggle removes both values'
+    Assert ((Get-ItemProperty ($registry + '\WindowsAI')).PSObject.Properties.Name -notcontains 'DisableAIDataAnalysis') 'Recall toggle removes the policy'
+    Assert ((Get-ItemProperty ($registry + '\Explorer')).TaskbarDa -eq 1) 'Widgets toggle restores the button'
     $tweaksText = Get-Content -LiteralPath (Join-Path $src 'Tweaks.ps1') -Raw
     $tweaksText = $tweaksText.Replace('HKCU:\Software\Microsoft\Windows\Windows Error Reporting', ($registry + '\Wer'))
     & ([scriptblock]::Create($tweaksText)) -WerUi On | Out-Null
@@ -406,7 +428,31 @@ public static class AstraPowerPolicy {
     $securityText = Get-Content -LiteralPath (Join-Path $src 'Security.ps1') -Raw
     Assert ($securityText -match "'Warn'" -and $securityText -match 'EnableMulticast' -and $securityText -match 'NoDriveTypeAutoRun' -and $securityText -match 'AstraMax\\Security') 'Security helper writes the documented hardening values and snapshots them'
     Assert ($debloatText -match "'\*NVIDIA\*'" -and $debloatText -match 'NVDisplay\.ContainerLocalSystem') 'Debloat protects NVIDIA packages and services'
-    Assert ($conf.Playbook.Version -eq '1.4.1') 'Playbook version is 1.4.1'
+    $extrasTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\astra-extras.yml') -Raw
+    foreach ($option in 'extra-game-dvr-off', 'extra-fso-off', 'extra-mpo-off', 'extra-qos-off', 'extra-search-local', 'extra-cloud-search-off', 'extra-recall-off', 'extra-widgets-off') {
+        Assert ($extrasTask -match [regex]::Escape("option: $option")) "Astra extras task gates $option"
+    }
+    Assert ($extrasTask -match '-GameDvr On' -and $extrasTask -match '-FullscreenOpt On' -and $extrasTask -match '-Mpo On' -and $extrasTask -match '-QosBandwidth On' -and $extrasTask -match '-SearchLocal On' -and $extrasTask -match '-CloudSearch On' -and $extrasTask -match '-Recall On' -and $extrasTask -match '-Widgets On') 'Astra extras task calls every QoL switch'
+    $extrasPage = @($conf.SelectNodes("//CheckboxPage[Options/CheckboxOption/Name='extra-game-dvr-off']"))
+    $extrasOptions = @($extrasPage[0].SelectNodes('Options/CheckboxOption'))
+    Assert ($extrasPage.Count -eq 1 -and $extrasOptions.Count -eq 4 -and @($extrasOptions | Where-Object IsChecked -eq 'true').Count -eq 0) 'Capture and display extras page exists with four unchecked options'
+    $searchPage = @($conf.SelectNodes("//CheckboxPage[Options/CheckboxOption/Name='extra-search-local']"))
+    $searchOptions = @($searchPage[0].SelectNodes('Options/CheckboxOption'))
+    Assert ($searchPage.Count -eq 1 -and $searchOptions.Count -eq 4 -and @($searchOptions | Where-Object IsChecked -eq 'true').Count -eq 0) 'Search extras page exists with four unchecked options'
+    Assert ($extrasTask -match 'option: extra-cloud-search-off' -and $extrasTask -match 'option: extra-recall-off' -and $extrasTask -match 'option: extra-widgets-off') 'Search extras page options are gated'
+    $startAllBackPage = @($conf.SelectNodes("//CheckboxPage[Options/CheckboxOption/Name='install-startallback']"))
+    Assert ($startAllBackPage.Count -eq 1 -and $startAllBackPage[0].SelectSingleNode('Options/CheckboxOption').IsChecked -eq 'false') 'StartAllBack is a separate unchecked option'
+    $startAllBackTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\startallback.yml') -Raw
+    Assert ($startAllBackTask -match 'option: install-startallback' -and $startAllBackTask -match 'StartAllBack\.ps1') 'StartAllBack task gates the shortcut option'
+    $startAllBackText = Get-Content -LiteralPath (Join-Path $src 'StartAllBack.ps1') -Raw
+    Assert ($startAllBackText -match 'startallback\.com' -and $startAllBackText -match 'StartAllBack_setup\.exe' -and $startAllBackText -match 'StartAllBack\.txt') 'StartAllBack helper stages the setup and writes the notes'
+    Assert ($startAllBackText -notmatch 'Start-Process' -and $startAllBackText -notmatch '/silent') 'StartAllBack helper never runs the installer silently'
+    $astrAppTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\astra-app.yml') -Raw
+    Assert ($astrAppTask -match 'StartAllBack\.ps1') 'Astra app deploy copies the StartAllBack helper'
+    $buildText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) '..\tools\build.ps1') -Raw
+    Assert ($buildText -match 'astra-extras\.yml' -and $buildText -match 'startallback\.yml' -and $buildText -match 'StartAllBack\.ps1') 'Build requires the new tasks and helper'
+    Assert ($mainText.Contains('Tasks\astra-extras.yml') -and $mainText.Contains('Tasks\startallback.yml')) 'New tasks are included in the main flow'
+    Assert ($conf.Playbook.Version -eq '1.5.0') 'Playbook version is 1.5.0'
     $builds = @($conf.Playbook.SupportedBuilds.string)
     Assert ($builds -contains '26300') 'Windows 11 26H2 build 26300 is supported'
     $qolText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\qol.yml') -Raw
