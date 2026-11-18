@@ -86,10 +86,6 @@ actions:
   - !writeStatus: {status: 'Deploying Astra Tweaks', option: install-astra-tweaks}
   - !task: {path: 'Tasks\astra-app.yml', option: install-astra-tweaks}
 
-  # Post-install toggle menu (turn any tweak back on or off later)
-  - !writeStatus: {status: 'Deploying post-install toolkit', option: postinstall-tool}
-  - !task: {path: 'Tasks\postinstall.yml', option: postinstall-tool}
-
   # NVIDIA app and Control Panel download shortcuts (Store-free recovery)
   - !writeStatus: {status: 'Adding NVIDIA download shortcuts', option: install-nvidia-tools}
   - !task: {path: 'Tasks\nvidia.yml', option: install-nvidia-tools}
