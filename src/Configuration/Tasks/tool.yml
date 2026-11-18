@@ -1,5 +1,5 @@
-title: Astra Tool
-description: Runs the bundled Astra installer silently
+title: Astra Max
+description: Installs Astra Max from its bundled NSIS installer (silent)
 actions:
   - !writeStatus: {status: 'Installing Astra', option: install-astra-max}
   # NSIS silent switch. If the installer is repacked with another toolchain,

@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 [CmdletBinding()]
 param()
 $ErrorActionPreference = 'Stop'
@@ -406,7 +406,7 @@ public static class AstraPowerPolicy {
     $securityText = Get-Content -LiteralPath (Join-Path $src 'Security.ps1') -Raw
     Assert ($securityText -match "'Warn'" -and $securityText -match 'EnableMulticast' -and $securityText -match 'NoDriveTypeAutoRun' -and $securityText -match 'AstraMax\\Security') 'Security helper writes the documented hardening values and snapshots them'
     Assert ($debloatText -match "'\*NVIDIA\*'" -and $debloatText -match 'NVDisplay\.ContainerLocalSystem') 'Debloat protects NVIDIA packages and services'
-    Assert ($conf.Playbook.Version -eq '1.4.0') 'Playbook version is 1.4.0'
+    Assert ($conf.Playbook.Version -eq '1.4.1') 'Playbook version is 1.4.1'
     $builds = @($conf.Playbook.SupportedBuilds.string)
     Assert ($builds -contains '26300') 'Windows 11 26H2 build 26300 is supported'
     $qolText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\qol.yml') -Raw

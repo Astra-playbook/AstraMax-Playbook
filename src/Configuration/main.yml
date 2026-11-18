@@ -1,5 +1,5 @@
 title: Astra Playbook
-description: Applies the selected tweak preset, power/network/DNS configuration, game profiles, runtimes and the bundled Astra tool
+description: Applies the selected tweak preset, power/network/DNS configuration, game profiles, runtimes, Astra Max and the Astra app
 actions:
   # Preset tiers are cumulative (light -> recommended -> extreme -> insane)
   - !writeStatus: {status: 'Applying Light preset', option: preset-light}
@@ -78,12 +78,12 @@ actions:
   - !writeStatus: {status: 'Installing game runtimes'}
   - !task: {path: 'Tasks\frameworks.yml'}
 
-  # Bundled tool
-  - !writeStatus: {status: 'Installing Astra tool'}
+  # Astra Max setup
+  - !writeStatus: {status: 'Installing Astra Max'}
   - !task: {path: 'Tasks\tool.yml'}
 
-  # Astra Tweaks app and the helper scripts it shares
-  - !writeStatus: {status: 'Deploying Astra Tweaks', option: install-astra-tweaks}
+  # Astra app and the helper scripts it shares
+  - !writeStatus: {status: 'Deploying Astra', option: install-astra-tweaks}
   - !task: {path: 'Tasks\astra-app.yml', option: install-astra-tweaks}
 
   # NVIDIA app and Control Panel download shortcuts (Store-free recovery)
