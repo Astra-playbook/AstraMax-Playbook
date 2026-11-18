@@ -42,22 +42,27 @@ $url = 'https://www.startallback.com/'
 $ws = New-Object -ComObject WScript.Shell
 $desktop = [Environment]::GetFolderPath('Desktop')
 $startMenu = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs'
-$destinations = @((Join-Path $desktop 'Install StartAllBack.lnk'))
-if (Test-Path -LiteralPath $startMenu) {
-    $destinations += (Join-Path $startMenu 'Install StartAllBack.lnk')
-}
-foreach ($path in $destinations) {
-    $lnk = $ws.CreateShortcut($path)
-    if (Test-Path -LiteralPath $setup) {
+$hasSetup = Test-Path -LiteralPath $setup
+$name = if ($hasSetup) { 'Install StartAllBack.lnk' } else { 'Install StartAllBack.url' }
+$folders = @($desktop)
+if (Test-Path -LiteralPath $startMenu) { $folders += $startMenu }
+foreach ($folder in $folders) {
+    # Remove either form so a re-run cannot leave a stale broken shortcut.
+    Remove-Item -LiteralPath (Join-Path $folder 'Install StartAllBack.lnk') -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath (Join-Path $folder 'Install StartAllBack.url') -Force -ErrorAction SilentlyContinue
+    $path = Join-Path $folder $name
+    if ($hasSetup) {
+        $lnk = $ws.CreateShortcut($path)
         $lnk.TargetPath = $setup
         $lnk.WorkingDirectory = $tools
         $lnk.Description = 'Install StartAllBack (paid add-on)'
+        $lnk.Save()
     }
     else {
-        $lnk.TargetPath = $url
-        $lnk.Description = 'Download StartAllBack (paid add-on)'
+        # A .lnk with an https target saves with an empty target; .url is the working form.
+        $ini = "[InternetShortcut]`r`nURL=$url`r`nIconIndex=0`r`n"
+        [IO.File]::WriteAllText($path, $ini, [Text.Encoding]::ASCII)
     }
-    $lnk.Save()
 }
 $log.Add('startallback: install shortcut added to the desktop and Start menu')
 $log.Add("startallback: notes at $(Join-Path $tools 'StartAllBack.txt')")

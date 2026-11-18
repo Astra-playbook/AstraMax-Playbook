@@ -447,12 +447,13 @@ public static class AstraPowerPolicy {
     $startAllBackText = Get-Content -LiteralPath (Join-Path $src 'StartAllBack.ps1') -Raw
     Assert ($startAllBackText -match 'startallback\.com' -and $startAllBackText -match 'StartAllBack_setup\.exe' -and $startAllBackText -match 'StartAllBack\.txt') 'StartAllBack helper stages the setup and writes the notes'
     Assert ($startAllBackText -notmatch 'Start-Process' -and $startAllBackText -notmatch '/silent') 'StartAllBack helper never runs the installer silently'
+    Assert ($startAllBackText -match 'InternetShortcut' -and $startAllBackText -match 'Install StartAllBack\.url') 'StartAllBack falls back to a working .url shortcut when the setup is absent'
     $astrAppTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\astra-app.yml') -Raw
     Assert ($astrAppTask -match 'StartAllBack\.ps1') 'Astra app deploy copies the StartAllBack helper'
     $buildText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) '..\tools\build.ps1') -Raw
     Assert ($buildText -match 'astra-extras\.yml' -and $buildText -match 'startallback\.yml' -and $buildText -match 'StartAllBack\.ps1') 'Build requires the new tasks and helper'
     Assert ($mainText.Contains('Tasks\astra-extras.yml') -and $mainText.Contains('Tasks\startallback.yml')) 'New tasks are included in the main flow'
-    Assert ($conf.Playbook.Version -eq '1.5.0') 'Playbook version is 1.5.0'
+    Assert ($conf.Playbook.Version -eq '1.5.1') 'Playbook version is 1.5.1'
     $builds = @($conf.Playbook.SupportedBuilds.string)
     Assert ($builds -contains '26300') 'Windows 11 26H2 build 26300 is supported'
     $qolText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\qol.yml') -Raw

@@ -25,22 +25,22 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Astra search extras** — local-only Start search, cloud search suggestions off, Recall snapshots off and the Widgets button hidden, off by default
 - **StartAllBack** — optional shortcut/staging page for the paid third-party shell add-on; the playbook never installs it silently and the installer is not committed (see the licensing note below)
 
-Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.5.0.
+Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.5.1.
 
 **Website:** [astra-playbook.github.io/AstraMax-Playbook](https://astra-playbook.github.io/AstraMax-Playbook/)
 
 ## Download
 
-- **[Astra-1.5.0.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.5.0.apbx)** - 340,648,370 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
-- **SHA256:** `56BDEA56AF2532D067AC48DEBF03F2C0FAB60310EE4B0234E54F7B45C3040A7D`
+- **[Astra-1.5.1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.5.1.apbx)** - 340,648,530 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
+- **SHA256:** `FD134EFA29C5A22AFFAF3755B8B2BBD8ED1AE279AC12D8B59D3AEEE25324607B`
 
-The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.5.0.apbx -Algorithm SHA256` before applying.
+The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.5.1.apbx -Algorithm SHA256` before applying.
 
 ## Project layout
 
 ```
 AstraMax-Playbook/
-├─ Astra-1.5.0.apbx                     # built artifact
+├─ Astra-1.5.1.apbx                     # built artifact
 ├─ src/
 │  ├─ playbook.conf                     # metadata, pages, options, requirements
 │  ├─ playbook.png
@@ -753,9 +753,9 @@ powershell -ExecutionPolicy Bypass -File tools/validate.ps1
 powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
 
-`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.5.0 artifact built from this tree is `Astra-1.5.0.apbx`, SHA256 `56BDEA56AF2532D067AC48DEBF03F2C0FAB60310EE4B0234E54F7B45C3040A7D`. The build refuses an archive that still contains the retired `PostInstall` menu.
+`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.5.1 artifact built from this tree is `Astra-1.5.1.apbx`, SHA256 `FD134EFA29C5A22AFFAF3755B8B2BBD8ED1AE279AC12D8B59D3AEEE25324607B`. The build refuses an archive that still contains the retired `PostInstall` menu.
 
-The repository tracks `Astra-1.5.0.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
+The repository tracks `Astra-1.5.1.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
 
 The `.apbx` must be a **7z archive, AES-256 encrypted with password `malte`, with the file list encrypted** (`-mhe=on`). That is AME Wizard's convention; a plain zip is rejected at load with *"Playbook must be encrypted using 'malte' as the password."* `build.ps1` does this through the portable `tools/7zr.exe` (download it from https://www.7-zip.org/a/7zr.exe if missing) using the equivalent of:
 
@@ -768,19 +768,19 @@ The script then re-lists the archive with the password, confirms `playbook.conf`
 ## Apply
 
 1. Download AME Wizard Beta and a clean Windows 11 ISO.
-2. Drag the ISO into AME Wizard, then drop `Astra-1.5.0.apbx` in.
+2. Drag the ISO into AME Wizard, then drop `Astra-1.5.1.apbx` in.
 3. Pick preset, debloat tier, service tier, components, power/interrupts, network, DNS/DoH, game profiles/extras, input/power, quality-of-life and latency extras, Defender and VBS options.
 4. Finish, write the image to USB (Rufus or built-in), and install — or apply to the running system if you drop the `FreshInstall` requirement.
 
 If AME still refuses the file at load, check the message. `Playbook must be encrypted using 'malte' as the password` means the archive was repacked (for example re-zipped or re-saved by an editor) and lost its 7z/AES encryption — rebuild it with `tools/build.ps1`. A generic "invalid playbook" with this archive usually means the AME Beta build is older than the playbook schema; the public Atlas/NOVA playbooks are the reference for the currently supported action names.
 
-## Verification status for 1.5.0
+## Verification status for 1.5.1
 
-1.5.0 adds two Astra extras pages (37-38) with eight toggles whose registry values were read from the Astra app's own backup state in `%LOCALAPPDATA%\AstraPC\State\system-tweaks.json`, plus a StartAllBack staging page (39). It keeps 1.4.1's Astra branding and the 1.4.0 removal of the retired post-install menu. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold across all 39 pages, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys, including both directions of all eight new toggles and static checks that the StartAllBack helper never runs an installer. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe`, `AstraTweaks\Astra.exe` and the new tasks inside, no `PostInstall` entry, no StartAllBack installer in the public build, unreadable headers without the password, and a clean integrity test.
+1.5.1 adds two Astra extras pages (37-38) with eight toggles whose registry values were read from the Astra app's own backup state in `%LOCALAPPDATA%\AstraPC\State\system-tweaks.json`, plus a StartAllBack staging page (39). It keeps 1.4.1's Astra branding and the 1.4.0 removal of the retired post-install menu. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold across all 39 pages, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys, including both directions of all eight new toggles and static checks that the StartAllBack helper never runs an installer. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe`, `AstraTweaks\Astra.exe` and the new tasks inside, no `PostInstall` entry, no StartAllBack installer in the public build, unreadable headers without the password, and a clean integrity test.
 
 The screenshots on the site were captured from Astra 1.6.4 running on Windows 11 on this PC (Dashboard, Tuning, Games, Power presets, Cleaner) and from the bundled Astra Max Setup before its Install step. No tweak was applied and the setup was cancelled before installing.
 
-Not executed for 1.5.0: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, the StartAllBack setup (never run, and not included in the public artifact), game benchmarks and any claim about FPS. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
+Not executed for 1.5.1: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, the StartAllBack setup (never run, and not included in the public artifact), game benchmarks and any claim about FPS. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
 ## Smoke-test checklist (VM first)
 
 1. Wizard shows 39 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled.
