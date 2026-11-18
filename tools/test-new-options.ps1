@@ -346,44 +346,6 @@ public static class AstraPowerPolicy {
     Assert ($stale.Count -eq 2 -and ($stale.Name -contains 'CDPUserSvc_deadbeef') -and -not ($stale.Name -contains 'Other_1234')) 'Stale user-service lookup matches only disabled template instance keys'
     $staleRemoved = Remove-AstraStaleUserServiceInstances -RootKey $staleRoot
     Assert ($staleRemoved -eq 2 -and -not (Test-Path -LiteralPath ($staleRoot + '\CDPUserSvc_deadbeef')) -and (Test-Path -LiteralPath ($staleRoot + '\Other_1234'))) 'Stale user-service cleanup deletes only template instance keys'
-    . (Join-Path $src 'PostInstall\Catalog.ps1')
-    foreach ($n in 58..100) {
-        $row = @($AstraModules | Where-Object N -eq $n)
-        Assert ($row.Count -eq 1) "Post-install row $n exists in the catalog"
-    }
-    Assert (@($AstraModules).Count -eq 100) 'Post-install catalog has exactly 100 rows'
-    $catalogGroups = @($AstraModules.Group | Sort-Object -Unique)
-    $guiPath = Join-Path $src 'PostInstall\PostInstallGui.ps1'
-    $catalogPath = Join-Path $src 'PostInstall\Catalog.ps1'
-    $guiTokens = $null
-    $guiErrors = $null
-    $guiAst = [System.Management.Automation.Language.Parser]::ParseFile($guiPath, [ref]$guiTokens, [ref]$guiErrors)
-    Assert ($guiErrors.Count -eq 0) 'Post-install GUI parses without syntax errors'
-    $catalogTokens = $null
-    $catalogErrors = $null
-    $catalogAst = [System.Management.Automation.Language.Parser]::ParseFile($catalogPath, [ref]$catalogTokens, [ref]$catalogErrors)
-    $navAssign = $catalogAst.Find({
-            param($a)
-            $a -is [System.Management.Automation.Language.AssignmentStatementAst] -and $a.Left.Extent.Text -eq '$AstraGroups'
-        }, $true)
-    $navGroups = @($navAssign.Right.FindAll({
-                param($n)
-                $n -is [System.Management.Automation.Language.StringConstantExpressionAst]
-            }, $true) | ForEach-Object Value)
-    $blurbAssign = $guiAst.Find({
-            param($a)
-            $a -is [System.Management.Automation.Language.AssignmentStatementAst] -and $a.Left.Extent.Text -eq '$groupBlurb'
-        }, $true)
-    $blurbTable = $blurbAssign.Right.Find({
-            param($n)
-            $n -is [System.Management.Automation.Language.HashtableAst]
-        }, $true)
-    $blurbKeys = @($blurbTable.KeyValuePairs | ForEach-Object { $_.Item1.Value })
-    Assert ((($navGroups | Where-Object { $_ -ne 'All' } | Sort-Object) -join '|') -eq (($catalogGroups) -join '|')) 'Every catalog group has a sidebar entry'
-    Assert ((($blurbKeys | Sort-Object) -join '|') -eq (($navGroups | Sort-Object) -join '|')) 'Every sidebar group has a description'
-    Assert ($navGroups.Count -eq $catalogGroups.Count + 1) 'Sidebar lists All plus every catalog group'
-    $guiText = Get-Content -LiteralPath $guiPath -Raw
-    Assert ($guiText -match '\$list\.AutoScroll = \$true') 'Tweak list scrolls when the catalog exceeds the viewport'
     $togglePage = @($conf.SelectNodes("//CheckboxPage[Options/CheckboxOption/Name='tweak-bg-apps']"))
     $toggleOptions = @($togglePage[0].SelectNodes('Options/CheckboxOption'))
     Assert ($togglePage.Count -eq 1 -and $toggleOptions.Count -eq 4 -and @($toggleOptions | Where-Object IsChecked -eq 'true').Count -eq 0) 'Optional toggles page exists with four unchecked options'
@@ -405,12 +367,6 @@ public static class AstraPowerPolicy {
     Assert ($nvidiaText -match '9NF8H0H7WMLT' -and $nvidiaText -match 'ms-windows-store://pdp/\?ProductId=9nf8h0h7wmlt' -and $nvidiaText -match 'winget install') 'NVIDIA diagnostic uses the documented Store id, PDP page and winget command'
     Assert ($nvidiaText -match 'nvcplui\.exe' -and $nvidiaText -match 'NVIDIAControlPanel' -and $nvidiaText -match 'wuauserv' -and $nvidiaText -match "'BITS'") 'NVIDIA diagnostic checks the package, the panel executable and the update services'
     Assert ($nvidiaText -match 'Debloat\.ps1 -Restore' -and $nvidiaText -match 'wsreset -i') 'NVIDIA diagnostic names the exact service and Store recovery steps'
-    $nvidiaModule = Get-Content -LiteralPath (Join-Path $src 'PostInstall\Modules\73-NvidiaTools.ps1') -Raw
-    Assert ($nvidiaModule -match 'MIXED - missing' -and $nvidiaModule -match 'Store missing' -and $nvidiaModule -match 'Windows Update disabled') 'NVIDIA row reports MIXED with the missing items and blockers'
-    $postinstallText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\postinstall.yml') -Raw
-    Assert ($postinstallText -match "'NvidiaTools\.ps1'") 'Post-install toolkit deploys the NVIDIA helper without the Astra app'
-    $telemetryText = Get-Content -LiteralPath (Join-Path $src 'PostInstall\Modules\74-NvidiaTelemetry.ps1') -Raw
-    Assert ($telemetryText -match 'NvTelemetryContainer' -and $telemetryText -match 'NvidiaTelemetry\.json' -and $telemetryText -match 'Start-Service') 'NVIDIA telemetry row snapshots and restores the service startup type'
     $extraTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\extra-privacy.yml') -Raw
     foreach ($option in 'extra-spotlight-off', 'extra-scoobe-off', 'extra-start-recent-off') {
         Assert ($extraTask -match [regex]::Escape("option: $option")) "Extra privacy task gates $option"
@@ -449,10 +405,8 @@ public static class AstraPowerPolicy {
     Assert ($restoreText -match '\[switch\]\$Security' -and $restoreText -match 'Security\.ps1' -and $restoreText -match '-AllOff') 'Restore.ps1 exposes a Security section'
     $securityText = Get-Content -LiteralPath (Join-Path $src 'Security.ps1') -Raw
     Assert ($securityText -match "'Warn'" -and $securityText -match 'EnableMulticast' -and $securityText -match 'NoDriveTypeAutoRun' -and $securityText -match 'AstraMax\\Security') 'Security helper writes the documented hardening values and snapshots them'
-    $postinstallText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\postinstall.yml') -Raw
-    Assert ($postinstallText -match "'Security\.ps1'") 'Post-install toolkit deploys the security helper'
     Assert ($debloatText -match "'\*NVIDIA\*'" -and $debloatText -match 'NVDisplay\.ContainerLocalSystem') 'Debloat protects NVIDIA packages and services'
-    Assert ($conf.Playbook.Version -eq '1.3.6') 'Playbook version is 1.3.6'
+    Assert ($conf.Playbook.Version -eq '1.4.0') 'Playbook version is 1.4.0'
     $builds = @($conf.Playbook.SupportedBuilds.string)
     Assert ($builds -contains '26300') 'Windows 11 26H2 build 26300 is supported'
     $qolText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\qol.yml') -Raw

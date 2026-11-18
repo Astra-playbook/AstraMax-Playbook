@@ -15,14 +15,7 @@ foreach ($page in $conf.SelectNodes('//RadioPage | //CheckboxPage')) {
     $limit = if ($page.Name -eq 'CheckboxPage' -and ($page.TopLine -or $page.BottomLine)) { 3 } else { 4 }
     if ($page.Options.ChildNodes.Count -gt $limit) { throw "Feature page exceeds $limit options: $($page.Description)" }
 }
-. (Join-Path $src 'Executables\PostInstall\Catalog.ps1')
-if (@($AstraModules | Group-Object N | Where-Object Count -gt 1).Count) { throw 'Duplicate module IDs' }
-foreach ($module in $AstraModules) {
-    $file = Join-Path $src ('Executables\PostInstall\Modules\' + $module.Script)
-    if (-not (Test-Path -LiteralPath $file)) { throw "Missing module: $($module.Script)" }
-    if ($module.Script -notmatch ('^{0:D2}-' -f $module.N)) { throw "Module prefix mismatch: $($module.Script)" }
-}
-'features: page limits and module catalog checked'
+'features: page limits checked'
 
 Get-ChildItem (Join-Path $src 'Executables') -Recurse -Include '*.ps1', '*.psm1' | ForEach-Object {
     $errors = $null

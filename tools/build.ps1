@@ -19,7 +19,6 @@ $required = @(
     'Configuration\main.yml',
     'Configuration\Tasks\astra-app.yml',
     'Configuration\Tasks\debloat.yml',
-    'Configuration\Tasks\postinstall.yml',
     'Configuration\Tasks\qol.yml',
     'Configuration\Tasks\services.yml',
     'Configuration\Tasks\tweaks.yml',
@@ -50,44 +49,6 @@ $required = @(
     'Executables\Redist\VisualCppRedist_AIO_x86_x64.exe',
     'Executables\Redist\directx_Jun2010_redist.exe',
     'Executables\Redist\windowsdesktop-runtime-8.0.34-win-x64.exe',
-    'Executables\PostInstall\Astra-PostInstall.cmd',
-    'Executables\PostInstall\PostInstall.ps1',
-    'Executables\PostInstall\PostInstallGui.ps1',
-    'Executables\PostInstall\Catalog.ps1',
-    'Executables\PostInstall\AstraMaxPostInstall.exe',
-    'Executables\PostInstall\Modules\_Common.ps1',
-    'Executables\PostInstall\Modules\01-PowerPlan.ps1',
-    'Executables\PostInstall\Modules\21-Wallpaper.ps1',
-    'Executables\PostInstall\Modules\26-MouseAcceleration.ps1',
-    'Executables\PostInstall\Modules\41-StoreAutoUpdate.ps1',
-    'Executables\PostInstall\Modules\73-NvidiaTools.ps1',
-    'Executables\PostInstall\Modules\74-NvidiaTelemetry.ps1',
-    'Executables\PostInstall\Modules\75-Spotlight.ps1',
-    'Executables\PostInstall\Modules\76-Scoobe.ps1',
-    'Executables\PostInstall\Modules\77-StartRecent.ps1',
-    'Executables\PostInstall\Modules\78-SmartScreen.ps1',
-    'Executables\PostInstall\Modules\79-Llmnr.ps1',
-    'Executables\PostInstall\Modules\80-Autorun.ps1',
-    'Executables\PostInstall\Modules\81-SecurityNotifications.ps1',
-    'Executables\PostInstall\Modules\82-CloudClipboard.ps1',
-    'Executables\PostInstall\Modules\83-GameBarTips.ps1',
-    'Executables\PostInstall\Modules\84-OnlineSpeech.ps1',
-    'Executables\PostInstall\Modules\85-InkTyping.ps1',
-    'Executables\PostInstall\Modules\86-LanguageList.ps1',
-    'Executables\PostInstall\Modules\87-TailoredExperiences.ps1',
-    'Executables\PostInstall\Modules\88-StartRecommendations.ps1',
-    'Executables\PostInstall\Modules\89-HiddenFiles.ps1',
-    'Executables\PostInstall\Modules\90-FullPath.ps1',
-    'Executables\PostInstall\Modules\91-TaskbarSmallIcons.ps1',
-    'Executables\PostInstall\Modules\92-HoverDelay.ps1',
-    'Executables\PostInstall\Modules\93-KeyboardRepeat.ps1',
-    'Executables\PostInstall\Modules\94-AudioDucking.ps1',
-    'Executables\PostInstall\Modules\95-WerUi.ps1',
-    'Executables\PostInstall\Modules\96-PagingExecutive.ps1',
-    'Executables\PostInstall\Modules\97-Maintenance.ps1',
-    'Executables\PostInstall\Modules\98-RestartApps.ps1',
-    'Executables\PostInstall\Modules\99-ClearPagefile.ps1',
-    'Executables\PostInstall\Modules\100-Wsh.ps1',
     'Executables\Security.ps1',
     'Configuration\Tasks\nvidia.yml',
     'Configuration\Tasks\extra-privacy.yml',
@@ -135,6 +96,9 @@ if ($listText -notmatch '(?m)\splaybook\.conf\s*$') {
 }
 if ($listText -notmatch 'Astra-Max-Setup\.exe') {
     throw 'Astra-Max-Setup.exe is missing from the archive'
+}
+if ($listText -match 'PostInstall') {
+    throw 'The retired post-install menu is still inside src; Astra is the only control panel'
 }
 
 # Expected to fail: proving the file list is encrypted, not just the data.

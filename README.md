@@ -1,4 +1,4 @@
-﻿# Astra Playbook (AME Wizard Beta)
+# Astra Playbook (AME Wizard Beta)
 
 An AME Wizard Beta `.apbx` playbook that combines:
 
@@ -6,7 +6,7 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Four-tier debloat** â€” Light, Moderate, Extreme or the warned Insane strip of preinstalled apps for every account, logged to `C:\AstraMax\Debloat\removed.json`
 - **Four-tier service debloat** â€” independent Light, Moderate, Extreme (Caution) and warned Insane tiers that set background services to Disabled and delete their cache/report folders; the Insane tier also disables per-user service templates, clears stale per-user keys and merges svchost groups, with startup types snapshotted for exact restore
 - **The bundled Astra tool** â€” `Astra-Max-Setup.exe` runs silently during the playbook
-- **Astra Tweaks app** â€” the bundled Astra PC app (`Astra.exe`, v1.6.4) deployed with a Desktop and Start Menu shortcut; it keeps its own backups, tweak state and logs in `%LOCALAPPDATA%\AstraPC`
+- **Astra app** — the bundled Astra performance suite (`Astra.exe`, v1.6.4): 228 tweaks across 22 categories, four reversible power presets, a games library, cleaner, benchmark and Restore & safety, deployed with a Desktop and Start Menu shortcut; state and backups live in `%LOCALAPPDATA%\AstraPC`
 - **Power and interrupt tuning** â€” core parking off, MSI interrupts, optional interrupt spreading or core-0 pinning
 - **Network stack, DNS and DoH presets** â€” balanced or low-latency stack, four resolver choices, optional encrypted DNS
 - **Game profiles** — reversible GPU preferences for COD HQ/Warzone, Siege, Fortnite, Apex and CS2; existing Siege/Fortnite config keys only, no anti-cheat changes
@@ -14,31 +14,30 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Astra wallpaper** — public abstract themes plus local personal static/live imports; the live option compiles a lightweight native host with masked hair sway and a red/blue glow pulse, with personal artwork excluded from the archive
 - **Launch options** â€” optional Steam launch-option writer for Siege, a Ubisoft Connect `uplay://launch/635/0` desktop shortcut, and generated Epic instructions for Fortnite
 - **Game runtime frameworks** â€” bundled installers for DirectX End-User Runtime June 2010, Visual C++ 2005-2022 All-in-One, .NET Framework 3.5 and .NET Desktop Runtime 8, so a fresh gaming install works offline
-- **Astra Post Install** â€” one self-elevating exe that opens a themed control center with category sidebar, search and 100 tweaks with live state and ON/OFF per row, including the four debloat tiers and the NVIDIA app/Control Panel diagnostic that names the exact install steps
 - **Quality-of-life tweaks** â€” classic right-click menu, dark mode, left-aligned taskbar, clock seconds, This PC, long paths, Start recommendations, clipboard history, plus optional background-apps-off, priority boost, sync-provider notifications off, Aero Shake off and a whole-OS animation toggle
 - **Gaming shell extras** â€” notification pop-ups off, instant menus, accessibility shortcut keys off, hidden Ink button and Edge sidebar/shopping/widget policies
-- **Privacy and nags** â€” optional lock screen Spotlight off, post-update setup prompts off and recently added apps list off, plus an NVIDIA telemetry service toggle in the post-install menu
+- **Privacy and nags** â€” optional lock screen Spotlight off, post-update setup prompts off and recently added apps list off, plus NVIDIA controls in the Astra app
 - **Latency extras** â€” global timer resolution, network adapter power saving off, optional CPU idle-state and memory-compression off, plus AC-only PCIe ASPM off, disk idle timeout off and the experimental kernel dynamic-tick setting
 - **Optional extras** â€” USB power saving off, OneDrive off, Edge background off, driver updates blocked
 - **Defender and VBS choices** â€” explicit, both default to disabled in this build; the safer choice and the anti-cheat trade-off are called out in the UI
 - **Security hardening** â€” a checked-by-default page turns SmartScreen on, disables LLMNR and disables AutoRun/AutoPlay per user, with previous values snapshotted under `ProgramData\AstraMax\Security`; a separate unchecked page turns SmartScreen and Security Center alerts off
 
-Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.3.6.
+Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.4.0.
 
 **Website:** [astra-playbook.github.io/AstraMax-Playbook](https://astra-playbook.github.io/AstraMax-Playbook/)
 
 ## Download
 
-- **[Astra-1.3.6.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.3.6.apbx)** - 340,667,395 bytes, AME Wizard Beta playbook (7z/AES-256, password `malte`)
-- **SHA256:** `E591C71FDB8BF783DE8B896412ABE2164CAD34D470852E8E9059F2DB3FF4C75A`
+- **[Astra-1.4.0.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.4.0.apbx)** - 340,645,970 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
+- **SHA256:** `7C3D3BD1EA943B92F4AAEB18F44CD7D2E84FC642C18EA387A491CBE1B2F1F193`
 
-The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.3.6.apbx -Algorithm SHA256` before applying.
+The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.4.0.apbx -Algorithm SHA256` before applying.
 
 ## Project layout
 
 ```
 AstraMax-Playbook/
-â”œâ”€ Astra-1.3.6.apbx                     # built artifact
+â”œâ”€ Astra-1.4.0.apbx                     # built artifact
 â”œâ”€ src/
 â”‚  â”œâ”€ playbook.conf                     # metadata, pages, options, requirements
 â”‚  â”œâ”€ playbook.png
@@ -68,8 +67,7 @@ AstraMax-Playbook/
 â”‚  â”‚     â”œâ”€ harden.yml                  # SmartScreen on, LLMNR off, AutoRun off (snapshotted)
 â”‚  â”‚     â”œâ”€ security.yml                # optional SmartScreen/alerts off, Defender and VBS choices
 â”‚  â”‚     â”œâ”€ extra-privacy.yml           # Spotlight, setup prompts, recent apps, cloud clipboard
-â”‚  â”‚     â”œâ”€ astra-app.yml               # deploys Astra Tweaks, helpers and shortcuts
-â”‚  â”‚     â”œâ”€ postinstall.yml             # deploys the Astra Post Install app
+â”‚  â”‚     â”œâ”€ astra-app.yml               # deploys the Astra app, helpers and shortcuts
 â”‚  â”‚     â”œâ”€ nvidia.yml                  # desktop/Start Menu NVIDIA App and driver shortcuts
 â”‚  â”‚     â”œâ”€ qol.yml                     # Explorer/taskbar/Start preferences
 â”‚  â”‚     â””â”€ tool.yml
@@ -90,15 +88,6 @@ AstraMax-Playbook/
 â”‚     â”œâ”€ Wallpaper.ps1                  # copies and applies the selected wallpaper
 â”‚     â”œâ”€ Astra-Wallpaper.png            # bundled 1792x1024 wallpaper (midnight blue)
 â”‚     â”œâ”€ Astra-Wallpaper-RedPurple.png  # bundled 1792x1024 wallpaper (red/purple)
-â”‚     â”œâ”€ PostInstall/
-â”‚     â”‚  â”œâ”€ Astra-PostInstall.cmd       # console fallback (same toggles)
-â”‚     â”‚  â”œâ”€ AstraMaxPostInstall.exe     # single-click launcher, self-elevating, no console
-â”‚     â”‚  â”œâ”€ PostInstallGui.ps1          # themed control-center window
-â”‚     â”‚  â”œâ”€ Catalog.ps1                 # single list of all 100 tweaks (number, group, note)
-â”‚     â”‚  â”œâ”€ PostInstall.ps1             # console menu (numbers, A all on, D all off)
-â”‚     â”‚  â””â”€ Modules/                    # one script per tweak + _Common.ps1
-â”‚     â”‚     â”œâ”€ _Common.ps1
-â”‚     â”‚     â”œâ”€ 01-PowerPlan.ps1 ... 100-Wsh.ps1
 â”‚     â”œâ”€ LaunchOptions.json             # per-game option source
 â””â”€ tools/
    â”œâ”€ 7zr.exe                           # portable 7-Zip console used for packaging
@@ -115,9 +104,9 @@ Option names in `playbook.conf` gate actions in YAML through `option:`. Tier fil
 3. Insane app strip (checkbox, unchecked, warned)
 4. Service tier (radio: none, light default, moderate, extreme caution)
 5. Insane service strip (checkbox, unchecked, warned)
-6. Tool, Astra Tweaks and game frameworks (checkboxes: Astra tool, Astra Tweaks app, DirectX, Visual C++)
+6. Astra Max, Astra app and game frameworks (checkboxes: Astra Max Setup, Astra app, DirectX, Visual C++)
 7. .NET runtimes (checkboxes: .NET Framework 3.5, .NET Desktop Runtime 8)
-8. NVIDIA tools (checkbox, unchecked: desktop/Start Menu shortcuts to the official NVIDIA App and driver pages, for restoring the Store-shipped Control Panel after debloat; post-install row 73 diagnoses the panel, Store, winget and update services and installs it from the Store when possible)
+8. NVIDIA tools (checkbox, unchecked: desktop/Start Menu shortcuts to the official NVIDIA App and driver pages, for restoring the Store-shipped Control Panel after debloat; NvidiaTools.ps1 later diagnoses the panel, Store, winget and update services and installs it from the Store when possible)
 9. Core parking and interrupts (radio)
 10. Network stack (radio)
 11. DNS resolver (radio)
@@ -144,9 +133,8 @@ Option names in `playbook.conf` gate actions in YAML through `option:`. Tier fil
 32. Taskbar End task (checkbox; Windows 11 23H2+)
 33. Security hardening (checkboxes, checked: SmartScreen on, LLMNR off, AutoRun off)
 34. Disable security (checkboxes, unchecked: SmartScreen off, Security Center alerts off)
-35. Post-install toolkit (checkbox: deploy the Astra Post Install app)
-36. Defender (radio, disabled by default)
-37. VBS (radio, disabled by default)
+35. Defender (radio, disabled by default)
+36. VBS (radio, disabled by default)
 
 Every radio page sets `IsRequired="true"` and `DefaultOption`, which AME requires for ISO
 injection. Current AME builds also enforce layout limits: a page with a `TopLine` or
@@ -256,17 +244,17 @@ Honest limits:
 - OneDrive cleanup removes app data and settings, not synced files; reinstalling OneDrive recreates its settings but not any file you deleted yourself.
 - Removing the Store means no new Store apps until you run `wsreset -i`; `winget` still works.
 - The NVIDIA Control Panel is a Store app, so a removed Store also removes its installer. NVIDIA
-  packages are protected from debloat; after install, post-install row 73 checks the adapter, driver,
+  packages are protected from debloat; after install, `NvidiaTools.ps1` checks the adapter, driver,
   NVIDIA App, Control Panel, Store, winget, `wuauserv` and `BITS`, names exactly what is missing, and
   installs the panel with `winget install "NVIDIA Control Panel" --id 9NF8H0H7WMLT -s msstore` when
   the Store and its services are healthy. If the Insane service tier disabled `wuauserv`/`BITS`, run
-  row 63 OFF or `Debloat.ps1 -Restore` and reboot first; if the Store is gone, `wsreset -i` restores
+  `Debloat.ps1 -Restore` and reboot first; if the Store is gone, `wsreset -i` restores
   it. A driver from nvidia.com always reinstalls the Control Panel without the Store.
 - No anti-cheat component is touched (BattlEye, EAC, Vanguard are outside these packages).
 - The engine was validated read-only on a machine that is already debloated; a stock image has not
   been run through it in this repo, so try the tier in a VM first.
 
-Re-run or inspect later (the script is deployed to `C:\AstraMax` when Astra Tweaks is installed):
+Re-run or inspect later (the script is deployed to `C:\AstraMax` when the Astra app is installed):
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File C:\AstraMax\Debloat.ps1 -Level Status
@@ -415,7 +403,7 @@ power down adapters again.
 
 ### Gaming latency extras
 
-Three AC-only options on their own wizard page, mirrored as post-install rows 65-67 and implemented in
+Three AC-only options on their own wizard page, implemented in
 `HardwareTweaks.ps1`:
 
 | Option | Value |
@@ -451,7 +439,7 @@ Windows default. Restart Explorer after restoring the menu.
 
 ## Windows extras (page 19)
 
-Four opt-in shell tweaks, also mirrored as post-install items 22â€“25:
+Four opt-in shell tweaks, also available in the Astra app:
 
 | Option | Value |
 | --- | --- |
@@ -465,7 +453,7 @@ All four are per-user and reversed by `Tweaks.ps1 -AllOff` or by toggling the ma
 
 ## Optional toggles
 
-Four more toggles, off by default, mirrored as post-install rows 58-61:
+Four more toggles, off by default, also available in the Astra app:
 
 | Option | Value |
 | --- | --- |
@@ -478,7 +466,7 @@ All four are reversed by `QoL.ps1 -AllOff` / `Restore.ps1 -QoL` or the matching 
 OFF returns `GlobalUserDisabled=0` and removes the toggle value; the other OFF paths delete their
 value. Priority separation is a scheduling preference, not an FPS promise.
 
-A fifth, separate toggle on its own wizard page and post-install row 64 covers OS-wide animations:
+A fifth, separate toggle on its own wizard page covers OS-wide animations:
 
 | Option | Value |
 | --- | --- |
@@ -489,7 +477,7 @@ Menus and transparency stay with the visual-effects option. Sign out or restart 
 
 ### Gaming shell extras
 
-Five more opt-in shell strips on two wizard pages, mirrored as post-install rows 68-72:
+Five more opt-in shell strips on two wizard pages, also available in the Astra app:
 
 | Option | Value |
 | --- | --- |
@@ -625,145 +613,6 @@ files are genuine Microsoft-signed installers.
 
 Dark mode sets both Windows/app light-theme values to zero without recreating the existing registry key, then broadcasts a theme refresh. Row 46 adds taskbar End task on Windows 11 23H2+; terminating an app can lose unsaved work.
 
-## Post-install control center
-
-The post-install toolkit page deploys one clickable file, **AstraMaxPostInstall.exe**, to `C:\AstraMax\PostInstall\`
-with **Astra Post Install** shortcuts on the Desktop and in the Start Menu. Double-clicking it
-needs no console and no manual "run as admin": the exe is compiled with a `requireAdministrator`
-manifest and starts the GUI PowerShell hidden, so the window that appears is already elevated.
-
-The window follows the Atlas/ReviOS toolbox layout:
-
-- dark Astra header with the machine name and an **ELEVATED** / **READ ONLY** badge, plus a matching dark title bar;
-- a category sidebar (All, Performance, CPU, GPU, Gaming, Network, Privacy, Shell, System, Input, Appearance, Security, Debloat) with a live tweak count per group and an accent marker on the active one;
-- a search box that filters on name, group and note text (`Ctrl+F` focuses it, `Esc` closes the window);
-- one row per tweak: number, name, group and a one-line note preview, a live `ON` / `OFF` / `MIXED` pill and **ON** / **OFF** buttons; risky notes are tinted;
-- a right rail with **WHAT THIS DOES**, **LIVE STATE** (the module's own status text) and **ACTIVITY**, which logs every toggle with the module output;
-- **ALL ON** / **ALL OFF** apply to the current category and search after confirmation, excluding the personal static/live wallpaper rows; OFF restores saved values only where supported;
-- sidebar utilities: **OPEN INSTALL FOLDER**, **RUN VERIFY REPORT** (streams `C:\AstraMax\Verify.ps1`) and **SIEGE UBI LAUNCH ARGS** (profile plus the launch-option instructions and shortcut);
-- risky rows (services, Defender real-time, spooler, debloat extreme, debloat Insane, services Insane) ask for confirmation before switching **on**; the two Insane rows are excluded from bulk actions;
-- item **21** switches the wallpaper (ON red and purple, OFF midnight blue) from the deployed `Assets` folder, so the app never needs the playbook files again.
-
-`Astra-PostInstall.cmd` and `PostInstall.ps1` stay as the console fallback with the same catalog:
-numbers, `A`, `D`, `R`, `Q`, and `-Status` / `-All On|Off` / `-IncludeRisky`. `Catalog.ps1` is the
-single source of truth for numbering, labels, groups, risk and notes, so the GUI and the console
-never disagree, and `Modules\NN-*.ps1` still keeps one file per tweak (usually 30â€“50 lines on top
-of `_Common.ps1`).
-
-| # | Module | What it toggles |
-| --- | --- | --- |
-| 1 | `01-PowerPlan` | Ultimate vs Balanced plan |
-| 2 | `02-CoreParking` | `CPMINCORES` / `CPMAXCORES` 100 vs 0 |
-| 3 | `03-CpuIdle` | processor idle disable |
-| 4 | `04-PowerThrottling` | `PowerThrottlingOff` |
-| 5 | `05-FastStartup` | `HiberbootEnabled` |
-| 6 | `06-Hibernation` | `powercfg /h on\|off` |
-| 7 | `07-MemoryCompression` | `Enable/Disable-MMAgent` |
-| 8 | `08-TimerResolution` | `GlobalTimerResolutionRequests` |
-| 9 | `09-GameMode` | Game Mode, DVR, capture, FSE |
-| 10 | `10-Mmcss` | MMCSS Games task |
-| 11 | `11-NetworkLatency` | Nagle, NetBIOS, WPAD, multicast DNS |
-| 12 | `12-Services` | DiagTrack, SysMain, WSearch, Xbox, NDU, WER (risky) |
-| 13 | `13-Telemetry` | telemetry policy, ads ID, CEIP tasks |
-| 14 | `14-Privacy` | web search, Cortana, activity history, location |
-| 15 | `15-VisualEffects` | transparency, menu delay |
-| 16 | `16-Explorer` | classic menu, This PC, clock seconds, extensions, clipboard, long paths |
-| 17 | `17-Taskbar` | widgets, chat, task view, search box, alignment |
-| 18 | `18-DriverUpdates` | Windows Update driver block |
-| 19 | `19-OneDrive` | sync policy + process |
-| 20 | `20-Defender` | real-time protection (risky) |
-| 21 | `21-Wallpaper` | red/purple vs midnight blue theme (ON = red) |
-| 22 | `22-StartupDelay` | `StartupDelayInMSec` 0 vs Windows default |
-| 23 | `23-SearchHighlights` | `IsDynamicSearchBoxEnabled` |
-| 24 | `24-Suggestions` | lock screen tips and Windows suggestion toasts |
-| 25 | `25-ExplorerRecent` | `ShowRecent` / `ShowFrequent` |
-| 26 | `26-MouseAcceleration` | `MouseSpeed` / thresholds (raw 1:1 input) |
-| 27 | `27-EdgeBackground` | Edge startup boost, background mode, preloading policies |
-| 28 | `28-UpdateAutoRestart` | `NoAutoRebootWithLoggedOnUsers` |
-| 29 | `29-DeliveryOptimization` | peer upload/download policy |
-| 30 | `30-UsbSelectiveSuspend` | USB selective suspend on AC/DC |
-| 31 | `31-Copilot` | Copilot policy + taskbar button |
-| 32 | `32-Recall` | Windows AI data analysis policy |
-| 33 | `33-AutoPlay` | AutoPlay prompts |
-| 34 | `34-RemoteAssistance` | Remote Assistance invitations |
-| 35 | `35-QosReserved` | `NonBestEffortLimit` 20 vs 0 |
-| 36 | `36-Prefetch` | Prefetcher / Superfetch |
-| 37 | `37-NetworkThrottling` | `NetworkThrottlingIndex` |
-| 38 | `38-ConsumerFeatures` | consumer content and suggested apps policy |
-| 39 | `39-LockScreen` | `NoLockScreen` |
-| 40 | `40-Spooler` | Print Spooler service (risky) |
-| 41 | `41-StoreAutoUpdate` | `AutoDownload` for Store apps |
-| 42 | `42-DebloatLight` | Light app tier (Clipchamp, Bing, Solitaire, People) |
-| 43 | `43-DebloatModerate` | Moderate app tier (Mail, Teams, Maps, media) |
-| 44 | `44-DebloatExtreme` | Extreme app tier (Store, Photos, Xbox, Copilot, OneDrive) plus data/AppModel cleanup (risky) |
-| 45 | `45-DarkMode` | Windows and apps dark mode |
-| 46 | `46-EndTask` | Taskbar End task (23H2+; unsaved work warning) |
-| 47 | `47-CpuBoost` | AC boost policy; restores saved active-scheme index (risky) |
-| 48 | `48-CpuEpp` | AC energy/performance preference; exact saved-index restore (risky) |
-| 49 | `49-GpuScheduling` | HAGS request; supported hardware/driver and reboot required (risky) |
-| 50 | `50-WindowedGaming` | Windowed DX10/DX11 optimizations; preserves other tokens |
-| 51 | `51-SiegeProfile` | Siege GPU preference and existing VSync key |
-| 52 | `52-FortniteProfile` | Fortnite GPU preference and existing VSync/dynamic-resolution keys |
-| 53 | `53-CodProfile` | COD HQ/Warzone GPU preference and manual graphics guide |
-| 54 | `54-ApexProfile` | Apex GPU preference and manual graphics guide |
-| 55 | `55-CS2Profile` | CS2 GPU preference and manual graphics guide |
-| 56 | `56-LiveWallpaper` | Private native live host (hair sway, glow pulse); excluded from bulk (risky) |
-| 57 | `57-PersonalWallpaper` | Private static import; excluded from bulk |
-| 58 | `58-BackgroundApps` | `GlobalUserDisabled=1`, `BackgroundAppGlobalToggle=0`; OFF restores the default |
-| 59 | `59-PriorityBoost` | `Win32PrioritySeparation` 38 vs 2 |
-| 60 | `60-SyncProviderAds` | `ShowSyncProviderNotifications=0`; OFF deletes the value |
-| 61 | `61-AeroShake` | `NoWindowMinimizingShortcuts=1`; OFF deletes the value |
-| 62 | `62-DebloatInsane` | Insane app strip (Calculator, Notepad, Snipping Tool, Paint, Sticky Notes, Get Help, OneNote, Wallet, Journal, Whiteboard, OneConnect, Raw Image Extension, Quick Assist, Widgets, web experience) plus 19 non-gaming optional features and deletion of each removed app's data folders and per-user AppModel keys; apps are irreversible, deleted data is permanent, excluded from bulk (risky) |
-| 63 | `63-ServicesInsane` | Insane process diet (Update/BITS, RDP, Xbox, biometrics, camera, smart cards, diagnostics, UPnP, VPN, update orchestration, 10 per-user templates, service-host grouping) that also deletes disabled services' cache/report folders and stale per-user keys; OFF restores all three snapshots and re-enables optional features but not deleted caches, excluded from bulk (risky) |
-| 64 | `64-Animations` | `MinAnimate=0` and `TaskbarAnimations=0` for the signed-in user; OFF restores both defaults. Sign out or restart Explorer |
-| 65 | `65-PciePower` | AC PCIe ASPM index 0; OFF restores the saved active-scheme index |
-| 66 | `66-DiskIdle` | AC disk idle timeout 0; OFF restores the saved index |
-| 67 | `67-DynamicTick` | `bcdedit` `disabledynamictick yes`; OFF restores the saved value or deletes it; reboot required (risky) |
-| 68 | `68-Notifications` | `ToastEnabled=0`; OFF writes `1` |
-| 69 | `69-MenuDelay` | `MenuShowDelay='0'`; OFF writes `'400'` |
-| 70 | `70-A11yKeys` | Sticky/Filter/Toggle Keys and Narrator shortcuts off; OFF writes the Windows defaults |
-| 71 | `71-InkWorkspace` | `PenWorkspaceButtonDesiredVisibility=0`; OFF writes `1` |
-| 72 | `72-EdgeGaming` | Edge sidebar, shopping, widgets and first-run off; OFF deletes only those four policy values |
-| 73 | `73-NvidiaTools` | Diagnoses adapter, NVIDIA driver, NVIDIA App, Control Panel, Store, winget, wuauserv and BITS. ON prints a numbered fix plan and installs the Control Panel with `winget ... -s msstore --id 9NF8H0H7WMLT` when the Store and its services are healthy; otherwise it prints the exact `Debloat.ps1 -Restore`, `wsreset -i`, winget and nvidia.com/drivers steps and opens the driver page. No NVIDIA binary is bundled. OFF has nothing to undo |
-| 74 | `74-NvidiaTelemetry` | Disables and stops `NvTelemetryContainer` when present; startup type is saved to `ProgramData\AstraMax\NvidiaTelemetry.json`; OFF restores it and starts the service if it was running |
-| 75 | `75-Spotlight` | `RotatingLockScreenEnabled=0` and `RotatingLockScreenOverlayEnabled=0`; OFF deletes both values |
-| 76 | `76-Scoobe` | `ScoobeSystemSettingEnabled=0`; OFF deletes the value |
-| 77 | `77-StartRecent` | `Start_TrackProgs=0`; OFF deletes the value. Sign out to finish |
-| 78 | `78-SmartScreen` | `SmartScreenEnabled='Warn'` plus policy `EnableSmartScreen=1`; ON snapshots the previous values under `ProgramData\AstraMax\Security`. OFF restores the snapshot, or writes `Off`/`0` when there is none |
-| 79 | `79-Llmnr` | Policy `EnableMulticast=0` (LLMNR off); OFF restores the snapshotted value or deletes it |
-| 80 | `80-Autorun` | Per-user `NoDriveTypeAutoRun=255`; OFF restores the snapshot or deletes the value |
-| 81 | `81-SecurityNotifications` | `Windows.SystemToast.SecurityAndMaintenance` `Enabled=0`; OFF writes `1` |
-| 82 | `82-CloudClipboard` | `CloudClipboardAutomaticUpload=0`; OFF deletes the value |
-| 83 | `83-GameBarTips` | `ShowStartupPanel=0`; OFF writes `1` |
-| 84 | `84-OnlineSpeech` | `OnlineSpeechPrivacy` `HasAccepted=0` (cloud speech declined); OFF removes the value |
-| 85 | `85-InkTyping` | `RestrictImplicitTextCollection=1` and `RestrictImplicitInkCollection=1`; OFF removes both |
-| 86 | `86-LanguageList` | `HttpAcceptLanguageOptOut=1`; OFF removes the value |
-| 87 | `87-TailoredExperiences` | `TailoredExperiencesWithDiagnosticDataEnabled=0`; OFF removes the value |
-| 88 | `88-StartRecommendations` | `Start_IrisRecommendations=0`; OFF removes the value |
-| 89 | `89-HiddenFiles` | `Hidden=1` (protected system files stay hidden); OFF writes `0` |
-| 90 | `90-FullPath` | `CabinetState` `FullPath=1`; OFF writes `0` |
-| 91 | `91-TaskbarSmallIcons` | `TaskbarSmallIcons=1`; sign out or restart Explorer; OFF writes `0` |
-| 92 | `92-HoverDelay` | `ExtendedUIHoverTime=0`; OFF removes the value |
-| 93 | `93-KeyboardRepeat` | `KeyboardDelay='0'` and `KeyboardSpeed='31'`; OFF restores delay `1` |
-| 94 | `94-AudioDucking` | `UserDuckingPreference=3`; OFF removes the value |
-| 95 | `95-WerUi` | `DontShowUI=1`; reports still follow the WER policy; OFF removes the value |
-| 96 | `96-PagingExecutive` | `DisablePagingExecutive=1`; reboot; ON snapshots the previous value under `ProgramData\AstraMax\Security`, OFF restores it or removes it |
-| 97 | `97-Maintenance` | `MaintenanceDisabled=1`; ON snapshots the previous value, OFF restores it or removes it |
-| 98 | `98-RestartApps` | `Winlogon` `RestartApps=0`; OFF removes the value |
-| 99 | `99-ClearPagefile` | `ClearPageFileAtShutdown=1`; shutdown takes longer; ON snapshots the previous value, OFF restores it or removes it |
-| 100 | `100-Wsh` | Windows Script Host `Enabled=0`; ON snapshots the previous value, OFF restores it or removes it. Breaks `.vbs`/`.js` scripts, so it is marked risky |
-
-The five debloat rows run the same `Debloat.ps1` the wizard used, so the wizard and the app never
-diverge. ON applies that tier (tiers are cumulative, so ON on 44 includes 42 and 43, and ON on 62
-includes all of them). OFF cannot reinstall apps — the row reports where the removal log is instead
-of pretending; the Store comes back with `wsreset -i` and the rest through the Store, `winget` or the
-names in `removed.json`. Row 44 asks for confirmation because it takes the Store and OneDrive with
-it; row 62 asks because it is irreversible; row 63's OFF restores the exact `Start` values saved in
-`service-state.json`.
-
-This is the "Atlas-style" after-install control surface. `Restore.ps1` still exists for a
-scripted full rollback; the menu is for one change at a time without re-reading flags.
-
 ## Optional extras
 
 - **USB power saving off** â€” clears `MSPower_DeviceEnable` for attached devices (helps mice/keyboards that drop out).
@@ -790,13 +639,31 @@ The components checkbox is enabled by default; clear it to skip the tool.
   Inno Setup, change the args to `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
 - Only redistribute the tool if its license allows it.
 
-## Astra Tweaks app
+## Astra app
 
-The second checkbox deploys the bundled **Astra PC** app instead of a hand-rolled shell.
-`Tasks/astra-app.yml` copies `Astra.exe` (v1.6.4, 78 MB) to `C:\AstraMax\AstraTweaks\`, copies
-the helper scripts (`Verify.ps1`, `Restore.ps1`, `Cleanup.ps1`, `Network.ps1`, `Tweaks.ps1`,
-`QoL.ps1`) to `C:\AstraMax\`, and creates **Astra Tweaks** shortcuts on the Desktop and in the
-Start Menu with the working directory set to the app folder.
+The Astra checkbox deploys the bundled **Astra** performance suite, the only control panel the
+archive installs. `Tasks/astra-app.yml` copies `Astra.exe` (v1.6.4, 78 MB) to
+`C:\AstraMax\AstraTweaks\`, copies the helper scripts (`Verify.ps1`, `Restore.ps1`, `Cleanup.ps1`,
+`Network.ps1`, `Tweaks.ps1`, `QoL.ps1`) to `C:\AstraMax\`, and creates **Astra** shortcuts on the
+Desktop and in the Start Menu with the working directory set to the app folder.
+
+Captured from the real build (screenshots in `docs/assets`):
+
+- **Dashboard** - health score and 11 checks, live CPU/GPU temperature and load, VRAM, the running
+  Windows plan, and a Game Mode session that reverts at the next restart.
+- **Tuning** - 228 tweaks across 22 categories (All, with Starter 34, Aggressive 28, Absolute 85 and
+  Max 42 collections), hardware playbook chips for AMD/Intel CPU and GPU plus NVIDIA, a search box
+  and a live state per row. Each change stores its original value.
+- **Power presets** - four reversible plans on the Balanced template (Gaming, Light work, Ultimate,
+  Absolute), each stating its processor range and what it cannot do.
+- **Games** - a scanned library, a curated optimiser list with full profiles or in-game guides, and
+  frame presets from Quality through Viral potato.
+- **Cleaner** - curated temp and cache folders, GPU shader caches, then TRIM or defrag on the drive
+  you pick.
+- **Benchmark and latency lab** - local CPU, memory and disk scores plus DPC, interrupt and timer
+  latency measured on this PC.
+- **Restore & safety** - reverts a single tweak, a category or everything from the app's own
+  backups; nothing is meant to be permanent.
 
 The app is self-contained: settings live in `%LOCALAPPDATA%\AstraPC\settings.json`, applied
 tweak backups in `State\*.json`, per-game config backups under `Backups\Games`, and run logs in
@@ -825,8 +692,10 @@ stays usable from other tooling.
 - SHA256 of the bundled build: `FE1B485143D4434F75B81E952D247EAF99E5ABCC70F06221125196EB0F542A76`
 - It is shipped unmodified. Confirm you have the right to redistribute it, and that the copy
   in `src/Executables/AstraTweaks/` is the build you intend to ship.
-- The deploy step only copies files and writes shortcuts. The app itself has not been launched
-  from an AME-injected image; test it once on a clean VM.
+- The deploy step only copies files and writes shortcuts. The app was launched on Windows 11
+  during this release and its Dashboard, Tuning, Games, Power presets and Cleaner pages were
+  captured with no tweak applied. It has not been launched from an AME-injected image; test it
+  once on a clean VM.
 
 The earlier PowerShell/WPF shell is kept in `legacy/AstraCenter.ps1` for reference. It is no
 longer deployed or packaged.
@@ -838,9 +707,9 @@ powershell -ExecutionPolicy Bypass -File tools/validate.ps1
 powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
 
-`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.3.6 artifact built from this tree is `Astra-1.3.6.apbx`, SHA256 `E591C71FDB8BF783DE8B896412ABE2164CAD34D470852E8E9059F2DB3FF4C75A`.
+`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.4.0 artifact built from this tree is `Astra-1.4.0.apbx`, SHA256 `7C3D3BD1EA943B92F4AAEB18F44CD7D2E84FC642C18EA387A491CBE1B2F1F193`. The build refuses an archive that still contains the retired `PostInstall` menu.
 
-The repository tracks `Astra-1.3.6.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
+The repository tracks `Astra-1.4.0.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
 
 The `.apbx` must be a **7z archive, AES-256 encrypted with password `malte`, with the file list encrypted** (`-mhe=on`). That is AME Wizard's convention; a plain zip is rejected at load with *"Playbook must be encrypted using 'malte' as the password."* `build.ps1` does this through the portable `tools/7zr.exe` (download it from https://www.7-zip.org/a/7zr.exe if missing) using the equivalent of:
 
@@ -853,27 +722,22 @@ The script then re-lists the archive with the password, confirms `playbook.conf`
 ## Apply
 
 1. Download AME Wizard Beta and a clean Windows 11 ISO.
-2. Drag the ISO into AME Wizard, then drop `AstraMax.apbx` in.
+2. Drag the ISO into AME Wizard, then drop `Astra-1.4.0.apbx` in.
 3. Pick preset, debloat tier, service tier, components, power/interrupts, network, DNS/DoH, game profiles/extras, input/power, quality-of-life and latency extras, Defender and VBS options.
 4. Finish, write the image to USB (Rufus or built-in), and install â€” or apply to the running system if you drop the `FreshInstall` requirement.
 
 If AME still refuses the file at load, check the message. `Playbook must be encrypted using 'malte' as the password` means the archive was repacked (for example re-zipped or re-saved by an editor) and lost its 7z/AES encryption â€” rebuild it with `tools/build.ps1`. A generic "invalid playbook" with this archive usually means the AME Beta build is older than the playbook schema; the public Atlas/NOVA playbooks are the reference for the currently supported action names.
 
-## Verification status for 1.3.6
+## Verification status for 1.4.0
 
-Safe fixture tests cover theme-key preservation, End task, the four optional toggles, the animation toggle, the five gaming shell toggles (including Edge policy write and delete-only-own-values), the three extra privacy toggles (Spotlight pair, setup-prompt value, recently added apps value; write and default restore), the NVIDIA diagnostic constants (Store id, PDP URI, winget command, `nvcplui.exe`, package family, `wuauserv`/`BITS`) and the MIXED status line, CPU/PCIe/disk AC-only writes and exact restoration, GPU tokens, dynamic-tick status parsing, game config/partial restoration, empty Lively layouts, the Insane service snapshot mapping, the per-user template and service-host snapshots, the optional-feature snapshot-once behavior, catalog rows 65-77, the new wizard pages and their task gates, and the bundled Redist paths. The service trace cleanup is fixture-tested: an orphaned cache folder is deleted, a live service's folder is refused, stale per-user instance keys are matched by template and removed while unrelated keys stay. The native host was verified on the development PC: its surface shows hair-only pixel movement plus red and blue glow deltas over time, the desktop capture shows the red pulse, and a fullscreen test window froze all three regions until it closed. Static/live restore paths and the startup shortcut were exercised. The image and mask data stay local.
+1.4.0 removes the retired post-install menu and ships Astra as the only control panel. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys; the catalog, GUI and post-install assertions were removed with the tool. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe` and `AstraTweaks\Astra.exe` inside, no `PostInstall` entry, unreadable headers without the password, and a clean integrity test.
 
-The live `Set-Service` snapshot/restore round-trip on a real service was blocked by the action policy and is unexecuted; only the mapping and file format are fixture-tested. The same applies to the per-user template writes, the `SvcHostSplitThresholdInKB` write and their restore paths: the JSON formats are fixture-tested, but no live service template or host-grouping change was applied on this PC. The optional-feature disable/restore path, the `bcdedit` write/restore path (blocked by elevation in the fixture run) and the three bundled installers inside an AME-injected image were not executed; their arguments and file hashes are verified, nothing more. The package-data and AppModel trace cleanup is fixture-tested for family-folder discovery and static-checked; no live package data was deleted on this already-cleaned host, so the delete path remains VM-first. OneDrive install-data/settings cleanup is also static-checked only; no live OneDrive uninstall was run on this PC. Service cache-folder deletion was exercised only against temp folders, and stale per-user key removal only against a test registry key; no real WER, SoftwareDistribution, Search, MapData, Diagnosis, spool or notification path was deleted on this PC, so the real-path delete remains VM-first. The new per-user toggles were also exercised live on the development PC (`QoL.ps1 -Spotlight/-Scoobe/-StartRecentApps On` then `Off`), the prior values were restored afterwards, and module status/report paths were read. The NVIDIA tools page, its task gate, row 73 and the shortcut writer are static-checked and the page is validated as unchecked; this PC has no NVIDIA adapter, so the GPU/app/Control Panel detection ran only in its "no adapter" path, the diagnostic never reached its install branch, no `winget`/Store install was attempted, and no NVIDIA download page was opened or installer run. Module 74 ran only its "service not installed" path because this PC has no NVIDIA telemetry service, so its snapshot/restore JSON round-trip is static-checked, not executed. The control center was launched from source, non-elevated (read-only), so the sidebar and search could be inspected; applying rows from the GUI was not exercised. Reboot startup, fresh AME/ISO deployment, game benchmarks and the bundled app/debloat engine on an injected image remain untested. A 50-60 idle process count on 25H2/26H2 was not observed on a reference image and is not promised. These are release checks, not claimed successes.
+The screenshots on the site were captured from Astra 1.6.4 running on Windows 11 on this PC (Dashboard, Tuning, Games, Power presets, Cleaner) and from the bundled Astra Max Setup before its Install step. No tweak was applied and the setup was cancelled before installing.
 
-New in 1.3.4, `Security.ps1` was fixture-tested with a temporary `ProgramData` and redirected registry paths: ON wrote `Warn` with policy `1`, `EnableMulticast=0` and `NoDriveTypeAutoRun=255`, and created one snapshot per item; OFF restored the prior AutoRun and SmartScreen values, removed the LLMNR value and deleted the snapshot; OFF without a snapshot wrote `Off`/`0`. The same harness covers the new `QoL.ps1` switches (`-SecurityNotifications`, `-CloudClipboard`, `-GameBarTips`) and catalog rows 78-83. The two new wizard pages, their default states and the harden/security task gates are static-checked. The hardening and disable-security actions were not executed live from an AME run, so they stay VM-first. Defender and VBS now default to disabled in the wizard; that changes only the default selection, the underlying `security.yml` actions are unchanged, and the live Defender, VBS and BCD writes remain unexecuted on this PC.
-
-The 17 rows added in 1.3.5 (84-100) were fixture-tested the same way: each `QoL.ps1` toggle wrote its documented value and removed or restored it on OFF; `Tweaks.ps1 -WerUi` hid and restored the crash dialog; and `Security.ps1` snapshotted and restored `DisablePagingExecutive`, `MaintenanceDisabled`, `ClearPageFileAtShutdown` and Windows Script Host `Enabled` against temp registry paths, with the snapshot files created and cleared. The catalog is asserted at exactly 100 rows and rows 84-100 are read by the menu and GUI through `Catalog.ps1`. The four kernel-level toggles (paging executive, maintenance, pagefile, WSH) were not applied to the live machine, and the Start, taskbar, Explorer and privacy toggles were not applied from an AME run; the status logic was exercised against the fixture keys only. WSH off is the one new row marked risky because it stops `.vbs`/`.js` scripts that some installers use.
-
-New in 1.3.6, the post-install window was rendered from source and inspected both offscreen and on-screen: all 13 categories fit the compact sidebar without scrolling at the default 1260x820 size, the list shows all 100 rows with working vertical scroll (row 100, "Windows Script Host off", renders at the bottom), no row control overflows its panel, and each category filter returned the expected count: Performance 16, CPU 3, GPU 4, Gaming 8, Network 5, Privacy 14, Shell 22, System 12, Input 3, Appearance 4, Security 5, Debloat 4. The probe deliberately skipped the live status rescan and applied no tweak; only row rendering and filter counts were verified from the GUI. A catalog-to-sidebar guard is now part of the test suite: every catalog group must have a sidebar entry and a description, and the catalog must stay at 100 rows.
-
+Not executed for 1.4.0: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, game benchmarks and any claim about FPS. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
 ## Smoke-test checklist (VM first)
 
-1. Wizard shows 37 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled. Each radio page has at most four choices; both Insane strips are unchecked checkboxes on their own warned pages; the gaming latency and shell pages, the extra privacy page, the disable-security page and the NVIDIA tools page are unchecked.
+1. Wizard shows 36 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled.
 2. Light run changes registry only; no services change.
 3. Recommended disables `DiagTrack`/`SysMain`; Extreme adds `WSearch`/`Spooler`; Insane adds `DoSvc`/`WpnService`.
 4. Desktop wallpaper changes to the selected Astra theme and survives a sign-out; the file exists at `C:\Windows\Web\Wallpaper\Astra\astra-wallpaper.png`.
@@ -881,32 +745,28 @@ New in 1.3.6, the post-install window was rendered from source and inspected bot
 6. Interrupt page logs GPU/NIC MSI hits; no device fails to boot after restart. Aggressive/Pinned set `DevicePolicy` 5/4 respectively.
 7. Network balanced leaves autotuning at `normal`; low latency adds the Nagle/NetBIOS values. `ipconfig /all` still shows a valid lease.
 8. DNS provider applies only to adapters with a gateway; DoH appears in `Get-DnsClientDohServerAddress` (Windows 11).
-9. Astra installer runs and installs after the preset steps.
-10. Astra Tweaks opens from the Desktop or Start Menu shortcut; `C:\AstraMax\AstraTweaks\Astra.exe` reports v1.6.4 and its log at `%LOCALAPPDATA%\AstraPC\Logs\astra.log` shows a start line.
+9. Astra Max Setup runs silently and installs after the preset steps.
+10. The Astra shortcut opens `C:\AstraMax\AstraTweaks\Astra.exe` (v1.6.4); the dashboard reads the machine, Tuning lists 228 tweaks, a power preset applies and reverts, and Restore & safety is reachable. Log at `%LOCALAPPDATA%\AstraPC\Logs\astra.log`.
 11. With the network cable pulled, DirectX, Visual C++ and .NET Desktop 8 install from the bundled `Redist` folder; `.NET 3.5` succeeds or is skipped cleanly when no source is available. `Get-ChildItem 'C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App'` shows an 8.0.x folder.
 12. Siege/Fortnite shortcuts appear; running one after install reports detected exe and config paths.
 13. Game profiles preserve unrelated GPU tokens, skip absent games, refuse changes while the game is running, and restore original config values without touching anti-cheat or global capture.
 14. Launch-options checkbox writes `Siege.txt`/`Fortnite.txt`; with Steam closed and a non-empty Siege string, only the `359550` block changes and a `.astra-backup` exists.
-15. Defender defaults to disabled; choosing â€œkeepâ€ only throttles scans, â€œdisableâ€ turns off real-time protection (tamper protection may block it).
+15. Defender defaults to disabled; choosing "keep" only throttles scans, "disable" turns off real-time protection (tamper protection may block it).
 16. VBS defaults to disabled; that choice clears `hypervisorlaunchtype`, memory integrity and Credential Guard. Confirm on a system that does not need Vanguard/FACEIT.
-17. Quality-of-life pages land: classic-menu CLSID key exists (restart Explorer to see the menu), `LongPathsEnabled=1`, `TaskbarAl=0`, `AppsUseLightTheme=0`, and `Verify.ps1` lists them. The optional toggles page (off by default) writes `GlobalUserDisabled=1`, `Win32PrioritySeparation=38`, `ShowSyncProviderNotifications=0` and `NoWindowMinimizingShortcuts=1` when ticked; post-install rows 58-61 flip each back. The separate animations page writes `MinAnimate=0` and `TaskbarAnimations=0`; row 64 or `QoL.ps1 -AllOff` restores both. The gaming shell pages (off by default) write `ToastEnabled=0`, `MenuShowDelay='0'`, the four accessibility values, `PenWorkspaceButtonDesiredVisibility=0` and the four Edge policies; rows 68-72 flip each back and `Verify.ps1` lists them under `Gaming shell extras`. The extra privacy page (off by default) writes `RotatingLockScreenEnabled=0`, `RotatingLockScreenOverlayEnabled=0`, `ScoobeSystemSettingEnabled=0`, `Start_TrackProgs=0` and `CloudClipboardAutomaticUpload=0`; rows 75-77 and 82 or `QoL.ps1 -AllOff` remove them again, and the Game Bar tips option writes `ShowStartupPanel=0` (row 83 writes it back).
-18. Latency extras: `GlobalTimerResolutionRequests=1`, every adapter reports â€œAllow the computer to turn off this deviceâ€ disabled, CPU idle shows disabled on AC only when selected, and `Get-MMAgent` matches the compression choice.
-19. Wallpaper page: picking "red and purple" writes `Astra-Wallpaper-RedPurple.png` to `C:\Windows\Web\Wallpaper\Astra\astra-wallpaper.png` and the desktop shows the crimson scene.
-20. Post-install app: **Astra Post Install** opens the red/purple control center with no console window and all 100 rows showing a live state; the category sidebar (including **Debloat** and **GPU**), the search box and the ON/OFF buttons on rows 01 and 44 all work; ON on 42 removes the Light apps and the row flips to ON, ON on 44 asks for confirmation; ON on 62 asks for confirmation and is excluded from ALL; ON on 73 prints the adapter/driver/App/panel/Store/winget/`wuauserv`/`BITS` diagnosis and the numbered fix plan, installs the panel with winget when the Store and services are healthy, and otherwise prints the exact `Debloat.ps1 -Restore`, `wsreset -i`, winget and nvidia.com/drivers steps; ON on 74 disables `NvTelemetryContainer` only when it exists; rows 78-80 report the hardening values and restore them on OFF; items 81-83 toggle the Security Center toast, cloud clipboard upload and Game Bar startup tips; items 84-100 cover the privacy, Explorer, taskbar, keyboard, audio, crash-dialog, memory, maintenance and script-host toggles, with 100 marked risky; item 21 switches the wallpaper to red and purple and back to midnight blue; `PostInstall.ps1 -All Off` restores settings where supported (risky items skipped unless `-IncludeRisky`; personal wallpaper rows always excluded; removed apps still need reinstallation).
-21. Windows extras page: with all four on, `StartupDelayInMSec=0`, `IsDynamicSearchBoxEnabled=0`, the three `SubscribedContent-*Enabled` values are 0 and `ShowRecent`/`ShowFrequent` are 0; `Verify.ps1` lists them under `Windows extras`.
-22. Siege launch options: `SIEGE UBI ARGS` writes `C:\AstraMax\LaunchOptions\Siege.txt` and drops `Rainbow Six Siege (Astra).url` on the Desktop that opens `uplay://launch/635/0`; with a non-empty Siege string and Steam closed, the saved `LaunchOptions.json` value is also written into Steam's `359550` block.
-23. Debloat Light removes Clipchamp/news/weather/Solitaire/People for the signed-in user, other accounts and as provisioned packages; `C:\AstraMax\Debloat\removed.json` lists each one with its full package name, and Moderate additionally drops Mail, Teams and Maps. Extreme removes the Store (`wsreset -i` brings it back) and takes OneDrive out with `OneDriveSetup.exe /uninstall`, then deletes its install data/settings while leaving `%USERPROFILE%\OneDrive` files alone. After each package is gone its `%LOCALAPPDATA%\Packages\<family>` and `C:\ProgramData\Packages\<family>` data folders and its HKCU AppModel repository/system-data keys are deleted; `Debloat.ps1 -Level Status` reports `app data leftovers : 0 folder(s) for tuned apps`. The separate Insane checkbox removes Calculator/Notepad/Snipping Tool/Paint/Sticky Notes plus Journal/Whiteboard/Widgets/Quick Assist, and disables the 19 non-gaming optional features into `feature-state.json`; it reports that apps and deleted data cannot be undone.
-24. Service tier: Light sets `MapsBroker`/`Fax`/`RemoteRegistry` to Disabled and leaves `DiagTrack` alone; Moderate also stops `DiagTrack`/`SysMain`; Extreme also stops `WSearch`/`Spooler`/`WpnService`; the separate Insane process-diet checkbox also stops `wuauserv`/`BITS`, RDP, Xbox, biometrics, camera, smart cards, diagnostics, UPnP discovery, VPN dialing, update orchestration and 10 per-user templates, then raises `SvcHostSplitThresholdInKB` to `0xFFFFFFFF` (reboot). After each service reports Disabled its cache/report folders are deleted (`SoftwareDistribution\Download`, `ProgramData\Microsoft\Network\Downloader`, WER queues/archives, `ProgramData\Microsoft\Search\Data`, `MapData`, `Diagnosis`, WDI, `spool\PRINTERS`, the notification database) and every deletion lands in `removed.json` with kind `service-data`; Insane also removes stale `<Template>_<LUID>` keys (kind `user-service-stale`) while live instances stay until sign-out. Before the first change `service-state.json` records each real `Start` value, `user-service-state.json` records each template, and `kernel-state.json` records the previous host value or its absence; `Debloat.ps1 -Restore` replays all three exactly (Manual stays Manual, delayed auto stays delayed), starts services that were running and re-enables the optional features recorded by Insane, but deleted caches stay deleted. `-Level Status` reports "services Light : N of 8 disabled", the per-user template count, the host-grouping state, `service data leftovers` and the stale key count; `Verify.ps1` prints the total process and svchost counts.
-25. Gaming latency extras (unchecked by default): ticking PCIe ASPM off and disk idle off writes AC index `0` and leaves the DC values alone; `powercfg /query` shows the new AC values and `HardwareTweaks.ps1 -Mode Off` restores the saved indices. Dynamic tick requires an elevated run, writes `disabledynamictick Yes`, and OFF restores the saved value or deletes it; reboot between checks.
-26. NVIDIA tools page (unchecked by default): ticking it adds `Get NVIDIA App.url` and `NVIDIA Drivers.url` to the Desktop and Start Menu, and both open the official nvidia.com pages. `NvidiaTools.ps1 -Mode Status` prints the adapter, driver, NVIDIA App, Control Panel, Store, winget and `wuauserv`/`BITS` lines; `-Mode Install` prints the numbered fix plan, runs `winget install "NVIDIA Control Panel" --id 9NF8H0H7WMLT -s msstore` when the Store and its services are healthy, and otherwise names `Debloat.ps1 -Restore`, `wsreset -i`, the Store PDP URI and nvidia.com/drivers. Row 73 shows the result as ON, OFF (no adapter) or MIXED with the missing items and blockers. No NVIDIA package is ever removed by debloat.
-27. Security hardening page (all three ticked by default): `HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer` `SmartScreenEnabled='Warn'`, policy `EnableSmartScreen=1`, policy `EnableMulticast=0` and `HKCU\...\Policies\Explorer` `NoDriveTypeAutoRun=255` are written, and `ProgramData\AstraMax\Security` holds one snapshot per item. `Security.ps1 -AllOff` (or Restore.ps1 `-Security`) restores the previous values or deletes the ones that did not exist. The disable-security page (unchecked) runs later: it writes `SmartScreenEnabled='Off'` with policy `0` and `Windows.SystemToast.SecurityAndMaintenance` `Enabled=0`; the hardening page wins if both are ticked.
-28. Rows 84-100: turning each on writes only its documented value (online speech `HasAccepted=0`, input restrictions, language opt-out, tailored experiences, Start recommendations, hidden files, full path, taskbar size and hover delay, keyboard repeat, audio ducking, `DontShowUI`, paging executive, maintenance, `RestartApps`, pagefile clearing, WSH). OFF restores the Windows default or the saved snapshot; the four kernel-level rows (96, 97, 99, 100) need a reboot to fully show, and row 100 stops `.vbs`/`.js` scripts until it is turned off.
+17. Quality-of-life pages land: classic-menu CLSID key exists (restart Explorer to see the menu), `LongPathsEnabled=1`, `TaskbarAl=0`, `AppsUseLightTheme=0`, and `Verify.ps1` lists them. The optional toggles, animations, gaming shell and extra privacy pages write their documented values only when ticked; `QoL.ps1 -AllOff` or the Astra app's restore returns them.
+18. Latency extras: `GlobalTimerResolutionRequests=1`, every adapter reports "Allow the computer to turn off this device" disabled, CPU idle shows disabled on AC only when selected, and `Get-MMAgent` matches the compression choice.
+19. Windows extras page: with all four on, `StartupDelayInMSec=0`, `IsDynamicSearchBoxEnabled=0`, the three `SubscribedContent-*Enabled` values are 0 and `ShowRecent`/`ShowFrequent` are 0; `Verify.ps1` lists them under `Windows extras`.
+20. Siege launch options: `SIEGE UBI ARGS` writes `C:\AstraMax\LaunchOptions\Siege.txt` and drops `Rainbow Six Siege (Astra).url` on the Desktop that opens `uplay://launch/635/0`.
+21. Debloat Light removes Clipchamp/news/weather/Solitaire/People; `C:\AstraMax\Debloat\removed.json` lists each one. Extreme removes the Store and OneDrive; `wsreset -i` brings the Store back. Deleted package data is not restored.
+22. Service tier: Light sets `MapsBroker`/`Fax`/`RemoteRegistry` to Disabled; Moderate also stops `DiagTrack`/`SysMain`; Extreme also stops `WSearch`/`Spooler`/`WpnService`; Insane adds the process diet. `Debloat.ps1 -Restore` replays `service-state.json` exactly.
+23. Gaming latency extras (unchecked by default): PCIe ASPM off and disk idle off write AC index `0` and leave DC alone; `HardwareTweaks.ps1 -Mode Off` restores the saved indices; dynamic tick needs a reboot.
+24. NVIDIA tools page (unchecked by default): ticking it adds the two desktop shortcuts; `NvidiaTools.ps1 -Mode Status` prints the diagnosis; no NVIDIA package is removed by debloat.
+25. Security hardening page (all three ticked by default): `SmartScreenEnabled='Warn'`, policy `EnableSmartScreen=1`, `EnableMulticast=0` and `NoDriveTypeAutoRun=255` are written, with one snapshot per item under `ProgramData\AstraMax\Security`. `Security.ps1 -AllOff` or `Restore.ps1 -Security` reverses them.
 
 Machine-wide changes run as `system`. Per-user values (wallpaper, shortcuts, game configs) run as the
 signed-in user through `currentUserElevated`, and `!registryValue` `HKCU` writes land in every loaded
 user hive, so they cover accounts other than the one that ran the wizard. If the wizard's action names
 differ in your AME build, compare against the public Atlas/NOVA playbooks before shipping.
-
 ## Rollback
 
 Run `Restore.ps1` for everything the playbook changed (or use `Astra.exe` for its own
@@ -921,9 +781,9 @@ backups). From a prompt:
 - **Gaming shell extras:** set `ToastEnabled=1`, `MenuShowDelay='400'`, the accessibility `Flags` back to `510`/`126`/`58` with `WinEnterLaunchEnabled=1`, `PenWorkspaceButtonDesiredVisibility=1`, and delete `HubsSidebarEnabled`, `EdgeShoppingAssistantEnabled`, `WebWidgetAllowed` and `HideFirstRunExperience`. `QoL.ps1 -AllOff` covers all five.
 - **Windows extras:** delete `StartupDelayInMSec`; set `IsDynamicSearchBoxEnabled=1`; set `SubscribedContent-338387Enabled`, `-338388Enabled`, `-310093Enabled`, `ShowRecent` and `ShowFrequent` to `1`. `Tweaks.ps1 -AllOff` covers all four.
 - **Debloat:** `Debloat.ps1 -Restore` restores each service's exact snapshot startup type and prints the reinstall list; `wsreset -i` brings the Store back (Extreme). Apps are reinstalled from the Store, `winget`, or the exact package names in `C:\AstraMax\Debloat\removed.json` â€” for another account, install once and it becomes available to everyone. Removed provisioned copies are not restored automatically; a clean image is the only full reset.
-- **Services:** `Debloat.ps1 -Restore` (or post-install row 63 OFF) replays `service-state.json`: Automatic, delayed Automatic, Manual and Disabled are restored exactly, and services that were running are started again. It also restores the 10 per-user templates from `user-service-state.json` (sign out/in to start them) and the previous `SvcHostSplitThresholdInKB` value from `kernel-state.json` (reboot to apply), then re-enables any optional feature recorded in `feature-state.json`. Service cache/report folders and stale per-user keys deleted by the service tier are not restored; Windows rebuilds the caches and recreates instance keys only when the service runs again. A single service can also be set back in `services.msc`.
+- **Services:** `Debloat.ps1 -Restore` replays `service-state.json`: Automatic, delayed Automatic, Manual and Disabled are restored exactly, and services that were running are started again. It also restores the 10 per-user templates from `user-service-state.json` (sign out/in to start them) and the previous `SvcHostSplitThresholdInKB` value from `kernel-state.json` (reboot to apply), then re-enables any optional feature recorded in `feature-state.json`. Service cache/report folders and stale per-user keys deleted by the service tier are not restored; Windows rebuilds the caches and recreates instance keys only when the service runs again. A single service can also be set back in `services.msc`.
 - **Steam launch options:** clear the field in Steam properties, or restore `localconfig.vdf.astra-backup` with Steam closed.
-- **Anything after install:** open the **Astra Post Install** app and press `ALL OFF` (or filter first; risky items ask or stay put), or run `PostInstall.ps1 -All Off`. On its own, module `20-Defender.ps1 -Mode Off` re-enables real-time protection.
+- **Anything after install:** open **Astra** and use Restore & safety to revert a tweak, a category or everything, or run `Restore.ps1`. For Defender alone, `Security.ps1` and the wizard page are the documented paths.
 - **Game Bar capture:** Settings â†’ Gaming â†’ Captures â†’ turn background recording back on.
 - **Everything else:** this is an AME playbook; re-image is the supported reset path.
 

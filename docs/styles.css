@@ -691,6 +691,73 @@ h2 {
   color: #d9b3d0;
 }
 
+/* Gallery */
+.playbook-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr;
+  gap: 56px;
+  align-items: start;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 22px;
+}
+
+.gallery-item,
+.setup-step {
+  margin: 0;
+}
+
+.gallery-item .shot-frame img {
+  width: 100%;
+  height: auto;
+}
+
+.gallery-item figcaption {
+  margin-top: 12px;
+  color: var(--dim);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.gallery-item figcaption strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.setup-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.setup-step .shot-frame {
+  padding: 6px;
+  border-radius: 12px;
+}
+
+.setup-step .shot-frame img {
+  border-radius: 7px;
+}
+
+.setup-step figcaption {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 11px;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.setup-step figcaption span {
+  font-family: var(--mono);
+  color: var(--pink);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+}
+
 /* Download */
 .download-card {
   display: grid;
@@ -1037,7 +1104,8 @@ h2 {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .toolkit-grid {
+  .toolkit-grid,
+  .playbook-grid {
     grid-template-columns: 1fr;
     gap: 36px;
   }
@@ -1137,6 +1205,11 @@ h2 {
   .feature-grid,
   .caveat-grid,
   .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery,
+  .setup-strip {
     grid-template-columns: 1fr;
   }
 

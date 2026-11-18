@@ -1,7 +1,7 @@
-title: Astra Tweaks app
-description: Deploys the bundled Astra PC app and the helper scripts the playbook uses
+title: Astra app
+description: Deploys the bundled Astra PC app (tuning, games, power, cleaner, restore) and the helper scripts the playbook uses
 actions:
-  - !writeStatus: {status: 'Deploying Astra Tweaks', option: install-astra-tweaks}
+  - !writeStatus: {status: 'Deploying Astra', option: install-astra-tweaks}
   - !powerShell:
     command: |
       $dir = 'C:\AstraMax'
@@ -16,24 +16,24 @@ actions:
       $ws = New-Object -ComObject WScript.Shell
 
       $desktop = [Environment]::GetFolderPath('Desktop')
-      $lnk = $ws.CreateShortcut((Join-Path $desktop 'Astra Tweaks.lnk'))
+      $lnk = $ws.CreateShortcut((Join-Path $desktop 'Astra.lnk'))
       $lnk.TargetPath = $exe
       $lnk.WorkingDirectory = $appDir
       $lnk.IconLocation = "$exe,0"
-      $lnk.Description = 'Astra PC - tweaks, game profiles, latency and restore'
+      $lnk.Description = 'Astra - tweaks, games, power, cleaner and restore'
       $lnk.Save()
 
       $startMenu = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs'
       if (Test-Path -LiteralPath $startMenu) {
-          $lnk2 = $ws.CreateShortcut((Join-Path $startMenu 'Astra Tweaks.lnk'))
+          $lnk2 = $ws.CreateShortcut((Join-Path $startMenu 'Astra.lnk'))
           $lnk2.TargetPath = $exe
           $lnk2.WorkingDirectory = $appDir
           $lnk2.IconLocation = "$exe,0"
-          $lnk2.Description = 'Astra PC - tweaks, game profiles, latency and restore'
+          $lnk2.Description = 'Astra - tweaks, games, power, cleaner and restore'
           $lnk2.Save()
       }
 
-      "astra tweaks: $exe"
+      "astra: $exe"
     exeDir: true
     runas: currentUserElevated
     wait: true
