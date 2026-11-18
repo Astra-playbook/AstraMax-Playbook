@@ -23,24 +23,24 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Security hardening** — a checked-by-default page turns SmartScreen on, disables LLMNR and disables AutoRun/AutoPlay per user, with previous values snapshotted under `ProgramData\AstraMax\Security`; a separate unchecked page turns SmartScreen and Security Center alerts off
 - **Astra capture and display extras** — the app's Game DVR, fullscreen-optimizations, MPO and QoS values reproduced exactly, all off by default and reversible from `Restore.ps1 -QoL`
 - **Astra search extras** — local-only Start search, cloud search suggestions off, Recall snapshots off and the Widgets button hidden, off by default
-- **StartAllBack** — optional install page for the paid third-party shell add-on; ticking it installs from the bundled setup (the public build only adds the official-page shortcut); the installer is not committed (see the licensing note below)
+- **StartAllBack** — optional install page for the paid third-party shell add-on; ticking it downloads the official signed setup from startallback.com and installs it silently, and the installer is never redistributed (see the licensing note below)
 
-Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Version 1.5.2.
+Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300), ISO injection or clean install. Astra V1 (playbook 1.0).
 
 **Website:** [astra-playbook.github.io/AstraMax-Playbook](https://astra-playbook.github.io/AstraMax-Playbook/)
 
 ## Download
 
-- **[Astra-1.5.2.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-1.5.2.apbx)** - 340,746,418 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
-- **SHA256:** `18ECAFEB83E3C3B0380D16D7B6E34387445E7CCD275819F86EB6480B8AE65010`
+- **[Astra-V1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-V1.apbx)** - 340,746,738 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
+- **SHA256:** `E4757A2C02E23049CE87310CFF7828B9822F7BAF61314E1B7A9CAB0F8F6CCD04`
 
-The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-1.5.2.apbx -Algorithm SHA256` before applying.
+The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-V1.apbx -Algorithm SHA256` before applying.
 
 ## Project layout
 
 ```
 AstraMax-Playbook/
-├─ Astra-1.5.2.apbx                     # built artifact
+├─ Astra-V1.apbx                        # built artifact
 ├─ src/
 │  ├─ playbook.conf                     # metadata, pages, options, requirements
 │  ├─ playbook.png
@@ -143,7 +143,7 @@ Option names in `playbook.conf` gate actions in YAML through `option:`. Tier fil
 36. VBS (radio, disabled by default)
 37. Capture and display extras (checkboxes, unchecked: Game DVR off, fullscreen optimizations off, MPO off, QoS reserved bandwidth released)
 38. Search extras (checkboxes, unchecked: local-only Start search, cloud search off, Recall off, Widgets button hidden)
-39. StartAllBack (checkbox, unchecked: installs from the bundled setup and adds the install shortcut; paid add-on; the public build only adds the official-page shortcut)
+39. StartAllBack (checkbox, unchecked: downloads the official signed setup from startallback.com, installs it silently and adds the install shortcut; paid add-on)
 
 Every radio page sets `IsRequired="true"` and `DefaultOption`, which AME requires for ISO
 injection. Current AME builds also enforce layout limits: a page with a `TopLine` or
@@ -526,18 +526,22 @@ lighter: they stop Bing and cloud suggestions while leaving the local index alon
 ### StartAllBack (optional, paid)
 
 StartAllBack is commercial, per-user licensed software from
-[startallback.com](https://www.startallback.com/). It is not in the public repository or the
-published release, and `Restore.ps1` does not cover it. Page 39 is off by default; ticking it copies
-the bundled setup to `C:\AstraMax\Tools`, runs it with `/install /elevated /silent`, writes
+[startallback.com](https://www.startallback.com/). Its EULA does not permit redistribution, so the
+installer is not in the public repository or the published release, and `Restore.ps1` does not cover
+it. Page 39 is off by default; ticking it downloads the official setup from
+`https://www.startallback.com/download.php` to `C:\AstraMax\Tools`, checks the Authenticode signature
+against the vendor's `Zinukhov` certificate, runs it with `/install /elevated /silent`, writes
 `C:\AstraMax\Tools\StartAllBack.txt`, and adds an "Install StartAllBack" shortcut to the desktop and
-Start menu. In a build without the setup, the same shortcut opens the official page and nothing is
-installed.
+Start menu. If the download or signature check fails, nothing runs and the shortcut opens the
+official page instead.
 
-To include it in a local build, place your licensed `StartAllBack_setup.exe` in `src/Executables/`
-before running `tools/build.ps1`. The file is gitignored and the build prints a redistribution
-warning. Do not publish a build that contains it unless your license allows redistribution.
-StartAllBack changes the Start menu and taskbar, not the search index; use the search extras above to
-lighten Start search itself.
+The download and signature check were tested against the current vendor build; the installer itself
+was not executed. For an offline build, place your licensed `StartAllBack_setup.exe` in
+`src/Executables/` before running `tools/build.ps1`; the helper prefers the bundled copy after the
+same signature check. The file is gitignored and the build prints a redistribution warning. Do not
+publish a build that contains it unless your license allows redistribution. StartAllBack changes the
+Start menu and taskbar, not the search index; use the search extras above to lighten Start search
+itself.
 
 ## Network stack presets
 
@@ -754,9 +758,9 @@ powershell -ExecutionPolicy Bypass -File tools/validate.ps1
 powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
 
-`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The 1.5.2 artifact built from this tree is `Astra-1.5.2.apbx`, SHA256 `18ECAFEB83E3C3B0380D16D7B6E34387445E7CCD275819F86EB6480B8AE65010`. The build refuses an archive that still contains the retired `PostInstall` menu.
+`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The Astra V1 artifact built from this tree is `Astra-V1.apbx`, SHA256 `E4757A2C02E23049CE87310CFF7828B9822F7BAF61314E1B7A9CAB0F8F6CCD04`. The build refuses an archive that still contains the retired `PostInstall` menu.
 
-The repository tracks `Astra-1.5.2.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
+The repository tracks `Astra-V1.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
 
 The `.apbx` must be a **7z archive, AES-256 encrypted with password `malte`, with the file list encrypted** (`-mhe=on`). That is AME Wizard's convention; a plain zip is rejected at load with *"Playbook must be encrypted using 'malte' as the password."* `build.ps1` does this through the portable `tools/7zr.exe` (download it from https://www.7-zip.org/a/7zr.exe if missing) using the equivalent of:
 
@@ -769,19 +773,19 @@ The script then re-lists the archive with the password, confirms `playbook.conf`
 ## Apply
 
 1. Download AME Wizard Beta and a clean Windows 11 ISO.
-2. Drag the ISO into AME Wizard, then drop `Astra-1.5.2.apbx` in.
+2. Drag the ISO into AME Wizard, then drop `Astra-V1.apbx` in.
 3. Pick preset, debloat tier, service tier, components, power/interrupts, network, DNS/DoH, game profiles/extras, input/power, quality-of-life and latency extras, Defender and VBS options.
 4. Finish, write the image to USB (Rufus or built-in), and install — or apply to the running system if you drop the `FreshInstall` requirement.
 
 If AME still refuses the file at load, check the message. `Playbook must be encrypted using 'malte' as the password` means the archive was repacked (for example re-zipped or re-saved by an editor) and lost its 7z/AES encryption — rebuild it with `tools/build.ps1`. A generic "invalid playbook" with this archive usually means the AME Beta build is older than the playbook schema; the public Atlas/NOVA playbooks are the reference for the currently supported action names.
 
-## Verification status for 1.5.2
+## Verification status for Astra V1
 
-1.5.2 makes StartAllBack a one-tick install: page 39 still runs only when the box is ticked, but now executes the bundled setup with `/install /elevated /silent` (three-minute guard) and keeps the desktop and Start menu shortcut; a build without the setup only adds the official-page shortcut and installs nothing. The progress screen now uses an Astra status line that names the phases, the playbook thumbnail is the new neon Astra "A", and the site wordmark uses the app's Georgia serif family. The eight Astra extras toggles from 1.5.1 are unchanged. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold across all 39 pages, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys, including both directions of all eight extras toggles, the new progress line, and static checks that the StartAllBack helper uses the silent switches with a timeout and keeps the `.url` fallback. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe`, `AstraTweaks\Astra.exe` and the tasks inside, no `PostInstall` entry, no StartAllBack installer in the public build, unreadable headers without the password, and a clean integrity test.
+Astra V1 makes the StartAllBack build the single public release: page 39 still runs only when the box is ticked, downloads the official setup from startallback.com, verifies its Authenticode signature and executes it with `/install /elevated /silent` (three-minute guard), keeping the desktop and Start menu shortcut. The vendor installer is not redistributed; if the download or signature check fails, nothing runs and the shortcut opens the official page. The playbook version is reset to 1.0 for the V1 release. The progress screen keeps the Astra status line, the playbook thumbnail is the neon Astra "A", and the site header now uses the app's purple orb emblem with the serif ASTRA lockup, PERFORMANCE SUITE subtitle and MAX pill; the footer and playbook view reuse the emblem. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold across all 39 pages, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys, including both directions of all eight extras toggles, the new progress line, and static checks that the StartAllBack helper downloads and verifies the official setup, uses the silent switches with a timeout and keeps the `.url` fallback. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe`, `AstraTweaks\Astra.exe` and the tasks inside, no `PostInstall` entry, no StartAllBack installer in the public build, unreadable headers without the password, and a clean integrity test.
 
 The screenshots on the site were captured from Astra 1.6.4 running on Windows 11 on this PC (Dashboard, Tuning, Games, Power presets, Cleaner) and from the bundled Astra Max Setup before its Install step. No tweak was applied and the setup was cancelled before installing.
 
-Not executed for 1.5.2: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, the StartAllBack installer path (the setup was never run, and it is not in the public artifact), game benchmarks and any claim about FPS. The new icon was only checked as a 256x256 render, so its appearance inside AME Wizard is unverified. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
+Not executed for Astra V1: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, the StartAllBack install path (the official setup was downloaded and its signature checked, but the installer was never run), game benchmarks and any claim about FPS. The site renders were checked from computed styles rather than a full browser screenshot, so the emblem and header lockup still need a visual pass in a browser. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
 ## Smoke-test checklist (VM first)
 
 1. Wizard shows 39 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled.
@@ -811,7 +815,7 @@ Not executed for 1.5.2: applying the archive through AME on a clean image or VM,
 25. Security hardening page (all three ticked by default): `SmartScreenEnabled='Warn'`, policy `EnableSmartScreen=1`, `EnableMulticast=0` and `NoDriveTypeAutoRun=255` are written, with one snapshot per item under `ProgramData\AstraMax\Security`. `Security.ps1 -AllOff` or `Restore.ps1 -Security` reverses them.
 26. Astra capture/display extras (unchecked): `GameDVR_Enabled=0`, `AppCaptureEnabled=0`, `AllowGameDVR=0`, the four `GameDVR_FSE*` values, `OverlayTestMode=5` and `NonBestEffortLimit=0` are written; `QoL.ps1 -AllOff` restores the Astra defaults (`1`/values deleted).
 27. Astra search extras (unchecked): `BingSearchEnabled=0`, both `Is*CloudSearchEnabled=0`, `DisableAIDataAnalysis=1` and `TaskbarDa=0` are written; sign out and confirm Start shows no web results and the Widgets button is gone.
-28. StartAllBack page (unchecked): in a build with the setup, ticking it runs the bundled installer silently and adds "Install StartAllBack" to the desktop and Start menu; without the setup it only adds the official-page shortcut. The installer path was not executed while preparing this release.
+28. StartAllBack page (unchecked): ticking it downloads the official setup from startallback.com, verifies the vendor signature, runs it silently and adds "Install StartAllBack" to the desktop and Start menu; a failed download or signature leaves only the official-page shortcut. The installer itself was not executed while preparing this release.
 
 Machine-wide changes run as `system`. Per-user values (wallpaper, shortcuts, game configs) run as the
 signed-in user through `currentUserElevated`, and `!registryValue` `HKCU` writes land in every loaded

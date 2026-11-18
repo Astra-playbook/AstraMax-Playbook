@@ -360,8 +360,8 @@ const PAGES = [
   },
   {
     n: 39, title: "StartAllBack",
-    prompt: "StartAllBack is a paid third-party Start menu and taskbar add-on with a per-user license (startallback.com). Ticking this installs it silently from the bundled setup and adds an install shortcut to the desktop and Start menu. A build without the setup only adds the shortcut, which opens the official page. Astra does not cover StartAllBack in Restore.ps1. It changes the shell, not the search index: use the search options above to lighten Start search itself.",
-    options: ["StartAllBack — install it from the bundled setup (paid add-on)"],
+    prompt: "StartAllBack is a paid third-party Start menu and taskbar add-on with a per-user license (startallback.com). Ticking this downloads the official signed setup from startallback.com, installs it silently and adds an install shortcut to the desktop and Start menu. If the download or signature check fails, the shortcut opens the official page. Astra never redistributes the installer and does not cover StartAllBack in Restore.ps1. It changes the shell, not the search index: use the search options above to lighten Start search itself.",
+    options: ["StartAllBack — download and install the official setup (paid add-on)"],
   },
 ];
 

@@ -6,29 +6,53 @@ $ErrorActionPreference = 'SilentlyContinue'
 $log = New-Object System.Collections.Generic.List[string]
 
 # StartAllBack is commercial, per-user licensed software. The feature option is
-# the consent: a build that bundles the setup installs it silently; a build
-# without it only adds a shortcut to the official page.
+# the consent: an offline build can use a bundled signed setup; every other
+# build downloads the official setup from the vendor. Astra does not
+# redistribute the installer.
 $tools = 'C:\AstraMax\Tools'
 New-Item -ItemType Directory -Path $tools -Force | Out-Null
 $setup = Join-Path $tools 'StartAllBack_setup.exe'
 $bundled = Join-Path $PSScriptRoot 'StartAllBack_setup.exe'
+$downloadUrl = 'https://www.startallback.com/download.php'
+
 if (Test-Path -LiteralPath $bundled) {
     Copy-Item -LiteralPath $bundled -Destination $setup -Force
-    $log.Add("startallback: setup staged at $setup")
-
-    $proc = Start-Process -FilePath $setup -ArgumentList '/install', '/elevated', '/silent' -PassThru
-    if (-not $proc) {
-        $log.Add('startallback: setup could not start; use the shortcut')
-    }
-    elseif ($proc.WaitForExit(180000)) {
-        $log.Add("startallback: setup finished (exit $($proc.ExitCode)); sign out to load the new shell")
-    }
-    else {
-        $log.Add('startallback: setup did not finish in 3 minutes; finish it from the shortcut')
-    }
+    $log.Add("startallback: bundled setup staged at $setup")
 }
 else {
-    $log.Add('startallback: setup not bundled; the shortcut opens startallback.com')
+    Remove-Item -LiteralPath $setup -Force -ErrorAction SilentlyContinue
+    $log.Add('startallback: downloading the official setup from startallback.com')
+    $ProgressPreference = 'SilentlyContinue'
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    try {
+        Invoke-WebRequest -Uri $downloadUrl -OutFile $setup -UseBasicParsing -TimeoutSec 90
+    }
+    catch {
+        Remove-Item -LiteralPath $setup -Force -ErrorAction SilentlyContinue
+        $log.Add("startallback: download failed ($($_.Exception.Message)); use the shortcut")
+    }
+}
+
+if (Test-Path -LiteralPath $setup) {
+    $sig = Get-AuthenticodeSignature -LiteralPath $setup
+    $signed = $sig.Status -eq 'Valid' -and $sig.SignerCertificate -and $sig.SignerCertificate.Subject -match 'Zinukhov'
+    if (-not $signed) {
+        $log.Add("startallback: setup signature is $($sig.Status); not run")
+        Remove-Item -LiteralPath $setup -Force -ErrorAction SilentlyContinue
+    }
+    else {
+        $log.Add("startallback: setup verified ($($sig.SignerCertificate.Subject))")
+        $proc = Start-Process -FilePath $setup -ArgumentList '/install', '/elevated', '/silent' -PassThru
+        if (-not $proc) {
+            $log.Add('startallback: setup could not start; use the shortcut')
+        }
+        elseif ($proc.WaitForExit(180000)) {
+            $log.Add("startallback: setup finished (exit $($proc.ExitCode)); sign out to load the new shell")
+        }
+        else {
+            $log.Add('startallback: setup did not finish in 3 minutes; finish it from the shortcut')
+        }
+    }
 }
 
 $readme = @'
@@ -39,10 +63,12 @@ StartAllBack is paid third-party software from startallback.com with a
 per-user license. It is not part of Windows and it is not covered by the
 Astra playbook's undo tools.
 
-Install: ticking the StartAllBack option installs it from the bundled
-setup. A build without the setup only adds the "Install StartAllBack"
-shortcut, which opens startallback.com. Sign out after installing so the
-new Start menu and taskbar load.
+Install: ticking the StartAllBack option downloads the official setup
+from startallback.com, verifies its signature and installs it silently.
+An offline build can use a bundled signed copy instead. If the download
+or verification fails, the "Install StartAllBack" shortcut opens the
+official page. Sign out after installing so the new Start menu and
+taskbar load.
 
 About search: StartAllBack changes the Start menu and taskbar, not the
 Windows search index. To make Start search itself lighter, enable the

@@ -445,15 +445,15 @@ public static class AstraPowerPolicy {
     $startAllBackTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\startallback.yml') -Raw
     Assert ($startAllBackTask -match 'option: install-startallback' -and $startAllBackTask -match 'StartAllBack\.ps1') 'StartAllBack task gates the install option'
     $startAllBackText = Get-Content -LiteralPath (Join-Path $src 'StartAllBack.ps1') -Raw
-    Assert ($startAllBackText -match 'startallback\.com' -and $startAllBackText -match 'StartAllBack_setup\.exe' -and $startAllBackText -match 'StartAllBack\.txt') 'StartAllBack helper stages the setup and writes the notes'
-    Assert ($startAllBackText -match 'Start-Process' -and $startAllBackText -match "'/install'" -and $startAllBackText -match "'/silent'" -and $startAllBackText -match 'WaitForExit') 'StartAllBack helper installs the bundled setup with a timeout'
+    Assert ($startAllBackText -match 'startallback\.com/download\.php' -and $startAllBackText -match 'Invoke-WebRequest' -and $startAllBackText -match 'Get-AuthenticodeSignature' -and $startAllBackText -match 'StartAllBack\.txt') 'StartAllBack helper downloads and verifies the official setup'
+    Assert ($startAllBackText -match 'Start-Process' -and $startAllBackText -match "'/install'" -and $startAllBackText -match "'/silent'" -and $startAllBackText -match 'WaitForExit') 'StartAllBack helper installs the setup with a timeout'
     Assert ($startAllBackText -match 'InternetShortcut' -and $startAllBackText -match 'Install StartAllBack\.url') 'StartAllBack falls back to a working .url shortcut when the setup is absent'
     $astrAppTask = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) 'Configuration\Tasks\astra-app.yml') -Raw
     Assert ($astrAppTask -match 'StartAllBack\.ps1') 'Astra app deploy copies the StartAllBack helper'
     $buildText = Get-Content -LiteralPath (Join-Path (Split-Path $src -Parent) '..\tools\build.ps1') -Raw
     Assert ($buildText -match 'astra-extras\.yml' -and $buildText -match 'startallback\.yml' -and $buildText -match 'StartAllBack\.ps1') 'Build requires the new tasks and helper'
     Assert ($mainText.Contains('Tasks\astra-extras.yml') -and $mainText.Contains('Tasks\startallback.yml')) 'New tasks are included in the main flow'
-    Assert ($conf.Playbook.Version -eq '1.5.2') 'Playbook version is 1.5.2'
+    Assert ($conf.Playbook.Version -eq '1.0') 'Playbook version is 1.0 (Astra V1)'
     Assert ($conf.Playbook.ProgressText -match 'working through the stack') 'Progress screen uses the custom Astra status line'
     $builds = @($conf.Playbook.SupportedBuilds.string)
     Assert ($builds -contains '26300') 'Windows 11 26H2 build 26300 is supported'
