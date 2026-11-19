@@ -1,25 +1,23 @@
-title: Astra Wallpaper
-description: Sets the bundled Astra wallpaper theme for the current user
+title: Astra wallpaper pack
+description: Copies the nine supplied wallpapers and applies only the selected wallpaper mode
 actions:
-  - !writeStatus: {status: 'Setting the Astra wallpaper', option: wp-astra}
   - !powerShell:
     command: |
-      & '.\Wallpaper.ps1' -Image '.\Astra-Wallpaper.png'
+      $gallery = Join-Path ([Environment]::GetFolderPath('MyPictures')) 'Astra\Wallpapers'
+      New-Item -ItemType Directory -Path $gallery -Force | Out-Null
+      Copy-Item -LiteralPath '.\Toolbox\Wallpapers' -Destination (Split-Path $gallery -Parent) -Recurse -Force
+      "wallpapers: $gallery"
     exeDir: true
     runas: currentUserElevated
     wait: true
-    ignoreErrors: true
-    option: wp-astra
 
-  - !writeStatus: {status: 'Setting the red and purple Astra wallpaper', option: wp-astra-red-purple}
   - !powerShell:
     command: |
-      & '.\Wallpaper.ps1' -Image '.\Astra-Wallpaper-RedPurple.png'
+      & '.\Wallpaper.ps1' -Image '.\Toolbox\Wallpapers\gojo.png'
     exeDir: true
     runas: currentUserElevated
     wait: true
-    ignoreErrors: true
-    option: wp-astra-red-purple
+    option: wp-gojo
 
   - !powerShell:
     command: |

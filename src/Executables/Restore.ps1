@@ -12,6 +12,8 @@ param(
     [switch]$Hardware,
     [switch]$Games,
     [switch]$Debloat,
+    [switch]$Toolbox,
+    [switch]$Wallpaper,
     [switch]$All,
     [switch]$Force,
     [switch]$Msi
@@ -27,9 +29,9 @@ if (-not $isAdmin) {
     exit 1
 }
 
-if ($All -or -not ($Power -or $Interrupts -or $Dns -or $Steam -or $Capture -or $Tweaks -or $QoL -or $Security -or $Hardware -or $Games -or $Debloat)) {
+if ($All -or -not ($Power -or $Interrupts -or $Dns -or $Steam -or $Capture -or $Tweaks -or $QoL -or $Security -or $Hardware -or $Games -or $Debloat -or $Toolbox -or $Wallpaper)) {
     if (-not $All) { Write-Host 'No section selected, restoring everything.' }
-    $Power = $true; $Interrupts = $true; $Dns = $true; $Steam = $true; $Capture = $true; $Tweaks = $true; $QoL = $true; $Security = $true; $Hardware = $true; $Games = $true; $Debloat = $true
+    $Power = $true; $Interrupts = $true; $Dns = $true; $Steam = $true; $Capture = $true; $Tweaks = $true; $QoL = $true; $Security = $true; $Hardware = $true; $Games = $true; $Debloat = $true; $Toolbox = $true; $Wallpaper = $true
 }
 
 if (-not $Force) {
@@ -45,6 +47,8 @@ if (-not $Force) {
     if ($Hardware) { Write-Host '  - restore saved CPU policies for the active scheme and GPU settings' }
     if ($Games) { Write-Host '  - restore saved per-game GPU and config values (close the games first)' }
     if ($Debloat) { Write-Host '  - restore the service startup types saved before the debloat tiers (removed apps stay removed)' }
+    if ($Toolbox) { Write-Host '  - restore the 41 reviewed Windows/browser choices from toolbox backups; use Astra System to review all saved tweak backups' }
+    if ($Wallpaper) { Write-Host '  - restore the previous static wallpaper and fit from the wallpaper snapshot' }
     Write-Host 'Re-run with -Force to apply.'
     exit 0
 }
@@ -175,6 +179,23 @@ if ($Debloat) {
     else {
         $log.Add('debloat: Debloat.ps1 is missing')
     }
+}
+if ($Toolbox) {
+    $helper = Join-Path $PSScriptRoot 'Invoke-ToolboxTweak.ps1'
+    foreach ($id in @(
+        'qol.search-history-off','exm-notification-sound-off','exm-restart-sign-on-off','abs.app.chrome-background-off','exm-chrome-online-spelling-off','exm-chrome-geolocation-off','max.visual.wallpaper-full-quality',
+        'sys-first-signin-animation-off','sys-signin-account-details-off','sys-start-recent-apps-off','sys-app-account-info-off','sys-app-contacts-off',
+        'chrome-search-suggestions-off','chrome-network-prediction-off','chrome-third-party-cookies-off','chrome-website-notifications-off','chrome-translation-off','chrome-download-location-prompt','chrome-cast-off','chrome-memory-saver-on','chrome-low-battery-saver-on',
+        'exm-settings-online-tips-off','exm-store-push-install-off','exm-message-cloud-sync-off','exm-chrome-feedback-off','exm-chrome-spellchecking-off','exm-chrome-sensors-off','exm-chrome-serial-off','exm-chrome-bluetooth-off','exm-chrome-webusb-off',
+        'exm-app-diagnostics-off','exm-app-calendar-off','exm-app-email-off','exm-app-messaging-off','exm-app-phone-off','exm-app-call-history-off','exm-app-tasks-off','exm-app-radio-control-off','exm-app-notification-reading-off','exm-app-unpaired-device-sync-off','sys-app-motion-off'
+    )) {
+        try { & $helper -Id $id -Restore -ErrorAction Stop | ForEach-Object { $log.Add([string]$_) } }
+        catch { $log.Add("toolbox: FAILED to restore $id ($($_.Exception.Message))") }
+    }
+}
+if ($Wallpaper) {
+    try { & (Join-Path $PSScriptRoot 'Wallpaper.ps1') -Restore -ErrorAction Stop | ForEach-Object { $log.Add([string]$_) } }
+    catch { $log.Add("wallpaper: FAILED to restore ($($_.Exception.Message))") }
 }
 $log | ForEach-Object { Write-Host $_ }
 Write-Host 'Reboot to finish restoring power and interrupt settings.'

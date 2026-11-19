@@ -1,0 +1,65 @@
+[
+    {
+        "id":  "gojo",
+        "title":  "Gojo - Hollow Purple",
+        "file":  "gojo.png",
+        "width":  1792,
+        "height":  1024
+    },
+    {
+        "id":  "night-rain",
+        "title":  "Night Rain",
+        "file":  "night-rain.png",
+        "width":  1345,
+        "height":  757
+    },
+    {
+        "id":  "azure-eyes",
+        "title":  "Azure Eyes",
+        "file":  "azure-eyes.png",
+        "width":  1345,
+        "height":  757
+    },
+    {
+        "id":  "obsidian-eye",
+        "title":  "Obsidian Eye",
+        "file":  "obsidian-eye.png",
+        "width":  1920,
+        "height":  1080
+    },
+    {
+        "id":  "shadow",
+        "title":  "Shadow",
+        "file":  "shadow.png",
+        "width":  1421,
+        "height":  757
+    },
+    {
+        "id":  "noir",
+        "title":  "Noir",
+        "file":  "noir.png",
+        "width":  1200,
+        "height":  750
+    },
+    {
+        "id":  "manga-rain",
+        "title":  "Manga Rain",
+        "file":  "manga-rain.png",
+        "width":  1920,
+        "height":  1080
+    },
+    {
+        "id":  "liquid-chrome",
+        "title":  "Liquid Chrome",
+        "file":  "liquid-chrome.png",
+        "width":  1345,
+        "height":  757
+    },
+    {
+        "id":  "monochrome",
+        "title":  "Monochrome",
+        "file":  "monochrome.png",
+        "width":  1404,
+        "height":  790
+    }
+]

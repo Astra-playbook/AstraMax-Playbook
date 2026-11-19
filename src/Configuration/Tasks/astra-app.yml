@@ -1,41 +1,36 @@
-title: Astra app
-description: Deploys the bundled Astra PC app (tuning, games, power, cleaner, restore) and the helper scripts the playbook uses
+title: Astra Toolbox
+description: Deploys the new Gojo-themed toolbox, complete original tweak engine, wallpaper gallery and playbook helpers
 actions:
-  - !writeStatus: {status: 'Deploying Astra', option: install-astra-tweaks}
+  - !writeStatus: {status: 'Preparing Astra Toolbox', option: install-astra-toolbox}
   - !powerShell:
     command: |
+      $runtime = Join-Path ${env:ProgramFiles} 'dotnet\shared\Microsoft.WindowsDesktop.App'
+      if (-not @(Get-ChildItem -LiteralPath $runtime -Directory -ErrorAction SilentlyContinue | Where-Object Name -like '8.*').Count) {
+          $setup = Start-Process -FilePath '.\Redist\windowsdesktop-runtime-8.0.34-win-x64.exe' -ArgumentList '/install', '/quiet', '/norestart' -Wait -PassThru
+          if ($setup.ExitCode -notin 0,3010) { throw "Required .NET Desktop Runtime failed: $($setup.ExitCode)" }
+      }
       $dir = 'C:\AstraMax'
-      $appDir = Join-Path $dir 'AstraTweaks'
+      $appDir = Join-Path $dir 'Toolbox'
       New-Item -ItemType Directory -Path $appDir -Force | Out-Null
-      foreach ($file in 'Verify.ps1', 'Restore.ps1', 'Cleanup.ps1', 'Network.ps1', 'Tweaks.ps1', 'QoL.ps1', 'Security.ps1', 'Debloat.ps1', 'NvidiaTools.ps1', 'StartAllBack.ps1') {
+      foreach ($file in 'Verify.ps1','Restore.ps1','Invoke-ToolboxTweak.ps1','Cleanup.ps1','Network.ps1','Tweaks.ps1','QoL.ps1','Security.ps1','Debloat.ps1','HardwareTweaks.ps1','GameProfiles.ps1','LaunchOptions.json','Interrupts.ps1','NvidiaTools.ps1','StartAllBack.ps1','Wallpaper.ps1','PersonalWallpaper.ps1','SystemInfo.ps1','RestorePoint.ps1') {
           Copy-Item -LiteralPath (Join-Path '.' $file) -Destination $dir -Force
       }
-      Copy-Item -LiteralPath '.\AstraTweaks\Astra.exe' -Destination (Join-Path $appDir 'Astra.exe') -Force
-
-      $exe = Join-Path $appDir 'Astra.exe'
+      Get-ChildItem -LiteralPath '.\Toolbox' | Where-Object Extension -ne '.cs' | Copy-Item -Destination $appDir -Recurse -Force
+      New-Item -ItemType Directory -Path (Join-Path $dir 'Redist') -Force | Out-Null
+      Copy-Item -LiteralPath '.\Redist\windowsdesktop-runtime-8.0.34-win-x64.exe' -Destination (Join-Path $dir 'Redist') -Force
+      $exe = Join-Path $appDir 'Astra-Toolbox.exe'
       $ws = New-Object -ComObject WScript.Shell
-
-      $desktop = [Environment]::GetFolderPath('Desktop')
-      $lnk = $ws.CreateShortcut((Join-Path $desktop 'Astra.lnk'))
-      $lnk.TargetPath = $exe
-      $lnk.WorkingDirectory = $appDir
-      $lnk.IconLocation = "$exe,0"
-      $lnk.Description = 'Astra - tweaks, games, power, cleaner and restore'
-      $lnk.Save()
-
-      $startMenu = Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs'
-      if (Test-Path -LiteralPath $startMenu) {
-          $lnk2 = $ws.CreateShortcut((Join-Path $startMenu 'Astra.lnk'))
-          $lnk2.TargetPath = $exe
-          $lnk2.WorkingDirectory = $appDir
-          $lnk2.IconLocation = "$exe,0"
-          $lnk2.Description = 'Astra - tweaks, games, power, cleaner and restore'
-          $lnk2.Save()
+      foreach ($folder in [Environment]::GetFolderPath('Desktop'), (Join-Path $env:ProgramData 'Microsoft\Windows\Start Menu\Programs')) {
+          if (-not (Test-Path -LiteralPath $folder)) { continue }
+          $shortcut = $ws.CreateShortcut((Join-Path $folder 'Astra Toolbox.lnk'))
+          $shortcut.TargetPath = $exe
+          $shortcut.WorkingDirectory = $appDir
+          $shortcut.IconLocation = "$exe,0"
+          $shortcut.Description = 'Astra Toolbox - Gojo, system details, restore points, tweaks, power and wallpapers'
+          $shortcut.Save()
       }
-
-      "astra: $exe"
+      "toolbox: $exe"
     exeDir: true
     runas: currentUserElevated
     wait: true
-    ignoreErrors: true
-    option: install-astra-tweaks
+    option: install-astra-toolbox

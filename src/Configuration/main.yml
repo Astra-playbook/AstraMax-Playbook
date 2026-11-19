@@ -1,5 +1,5 @@
 title: Astra Playbook
-description: Applies the selected tweak preset, power/network/DNS configuration, game profiles, runtimes, Astra Max and the Astra app
+description: Applies the selected preset, power, network, profiles, runtimes, reviewed EXM settings and the Gojo Astra Toolbox
 actions:
   # Preset tiers are cumulative (light -> recommended -> extreme -> insane)
   - !writeStatus: {status: 'Applying Light preset', option: preset-light}
@@ -81,13 +81,9 @@ actions:
   - !writeStatus: {status: 'Installing game runtimes'}
   - !task: {path: 'Tasks\frameworks.yml'}
 
-  # Astra Max setup
-  - !writeStatus: {status: 'Installing Astra Max'}
-  - !task: {path: 'Tasks\tool.yml'}
-
-  # Astra app and the helper scripts it shares
-  - !writeStatus: {status: 'Deploying Astra', option: install-astra-tweaks}
-  - !task: {path: 'Tasks\astra-app.yml', option: install-astra-tweaks}
+  - !writeStatus: {status: 'Deploying the Gojo Astra Toolbox', option: install-astra-toolbox}
+  - !task: {path: 'Tasks\astra-app.yml', option: install-astra-toolbox}
+  - !task: {path: 'Tasks\exm-extras.yml'}
 
   # StartAllBack (paid add-on; installs only when the option is ticked)
   - !writeStatus: {status: 'Setting up StartAllBack', option: install-startallback}

@@ -5,8 +5,8 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Four cumulative tweak presets** — Light, Recommended, Extreme, Insane
 - **Four-tier debloat** — Light, Moderate, Extreme or the warned Insane strip of preinstalled apps for every account, logged to `C:\AstraMax\Debloat\removed.json`
 - **Four-tier service debloat** — independent Light, Moderate, Extreme (Caution) and warned Insane tiers that set background services to Disabled and delete their cache/report folders; the Insane tier also disables per-user service templates, clears stale per-user keys and merges svchost groups, with startup types snapshotted for exact restore
-- **Astra Max** — `Astra-Max-Setup.exe` (v1.6.4) runs silently during the playbook and installs the Astra Max suite the way its own installer does
-- **Astra app** — the bundled Astra performance suite (`Astra.exe`, v1.6.4): 228 tweaks across 22 categories, four reversible power presets, a games library, cleaner, benchmark and Restore & safety, deployed with a Desktop and Start Menu shortcut; state and backups live in `%LOCALAPPDATA%\AstraPC`
+- **Astra Gojo Toolbox** — a native frosted-glass Windows app with 266 tweaks across 22 categories (228 originals plus 38 reviewed additions), power presets, games, cleaner and nine wallpapers; replaces the retired Astra Max installer and UI while retaining the original tweak engine and `%LOCALAPPDATA%\AstraPC` snapshots
+- **System and recovery** — read-only PC inventory, evidence-based improvement advice, saved-value restoration and explicit Windows restore-point creation; no invented sensors or guaranteed FPS gains
 - **Power and interrupt tuning** — core parking off, MSI interrupts, optional interrupt spreading or core-0 pinning
 - **Network stack, DNS and DoH presets** — balanced or low-latency stack, four resolver choices, optional encrypted DNS
 - **Game profiles** — reversible GPU preferences for COD HQ/Warzone, Siege, Fortnite, Apex and CS2; existing Siege/Fortnite config keys only, no anti-cheat changes
@@ -31,8 +31,8 @@ Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300),
 
 ## Download
 
-- **[Astra-V1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/main/Astra-V1.apbx)** - 340,746,738 bytes, AME Wizard Beta playbook with Astra Max Setup and the Astra app (7z/AES-256, password `malte`)
-- **SHA256:** `E4757A2C02E23049CE87310CFF7828B9822F7BAF61314E1B7A9CAB0F8F6CCD04`
+- **[Astra-V1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/refs/heads/main/Astra-V1.apbx)** - 203,182,385 bytes, AME Wizard Beta playbook with the frosted-glass Gojo toolbox, 266 tweaks, 52 wizard pages and 41 reviewed opt-in Windows/browser choices (7z/AES-256, password `malte`)
+- **SHA256:** `934F412D438C4E546D0340A3AC9167D219A987AA4A8AA505D733377EE36D9400`
 
 The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-V1.apbx -Algorithm SHA256` before applying.
 
@@ -77,8 +77,12 @@ AstraMax-Playbook/
 │  │     ├─ qol.yml                     # Explorer/taskbar/Start preferences
 │  │     └─ tool.yml
 │  └─ Executables/
-│     ├─ Astra-Max-Setup.exe
-│     ├─ AstraTweaks/Astra.exe          # bundled Astra PC app (v1.6.4)
+│     ├─ Toolbox/Astra-Toolbox.exe      # native Gojo toolbox launcher
+│     ├─ Toolbox/Toolbox.dll            # UI and 38 reviewed supplemental definitions
+│     ├─ Toolbox/Astra.Core.dll         # unchanged original 228-tweak engine
+│     ├─ SystemInfo.ps1                 # bounded read-only PC inventory
+│     ├─ RestorePoint.ps1               # explicitly requested, verified Windows restore point
+│     ├─ Invoke-ToolboxTweak.ps1         # fixed 41-choice apply/revert bridge
 │     ├─ Redist/                        # bundled offline runtimes (DirectX, VC++, .NET 8)
 │     ├─ Verify.ps1                     # read-only state report
 │     ├─ Restore.ps1                    # undo power, interrupts, DNS/DoH, Steam, capture, tweaks, QoL
@@ -110,14 +114,14 @@ Option names in `playbook.conf` gate actions in YAML through `option:`. Tier fil
 3. Insane app strip (checkbox, unchecked, warned)
 4. Service tier (radio: none, light default, moderate, extreme caution)
 5. Insane service strip (checkbox, unchecked, warned)
-6. Astra Max, Astra app and game frameworks (checkboxes: Astra Max Setup, Astra app, DirectX, Visual C++)
+6. Astra Gojo Toolbox and game frameworks (checkboxes: replacement toolbox, DirectX, Visual C++)
 7. .NET runtimes (checkboxes: .NET Framework 3.5, .NET Desktop Runtime 8)
 8. NVIDIA tools (checkbox, unchecked: desktop/Start Menu shortcuts to the official NVIDIA App and driver pages, for restoring the Store-shipped Control Panel after debloat; NvidiaTools.ps1 later diagnoses the panel, Store, winget and update services and installs it from the Store when possible)
 9. Core parking and interrupts (radio)
 10. Network stack (radio)
 11. DNS resolver (radio)
 12. DNS over HTTPS (checkbox)
-13. Wallpaper (radio: personal live import default, personal static import, red/purple, midnight blue)
+13. Wallpaper (radio: Gojo default, keep current, personal static import, personal live import)
 14. Game profiles (checkboxes: Siege, Fortnite, custom Siege launch options, COD HQ/Warzone)
 15. Additional games (checkboxes: Apex, CS2)
 16. Fortnite launch instructions and system extras (checkboxes)
@@ -144,6 +148,21 @@ Option names in `playbook.conf` gate actions in YAML through `option:`. Tier fil
 37. Capture and display extras (checkboxes, unchecked: Game DVR off, fullscreen optimizations off, MPO off, QoS reserved bandwidth released)
 38. Search extras (checkboxes, unchecked: local-only Start search, cloud search off, Recall off, Widgets button hidden)
 39. StartAllBack (checkbox, unchecked: downloads the official signed setup from startallback.com, installs it silently and adds the install shortcut; paid add-on)
+40. Reviewed Windows preferences (search history, notification sound, restart sign-on)
+41. Reviewed Chrome and wallpaper preferences (background apps, online spelling, location, JPEG quality)
+42. Sign-in and Start preferences (first sign-in animation, account details, recent apps)
+43. Windows-app account information and contacts
+44. Chrome search, prediction, third-party cookies and notifications
+45. Chrome translation, download location, Cast and Memory Saver
+46. Chrome low-battery Energy Saver
+47. Settings online tips, remote Store install and message cloud sync
+48. Chrome sensors, Serial, Web Bluetooth and WebUSB permissions
+49. Chrome feedback and all spellchecking
+50. Windows-app calendar, email, messaging and phone access
+51. Windows-app diagnostics, call history, tasks and notification access
+52. Windows-app radios, unpaired-device sync and motion access
+
+All reviewed choices on pages 40-52 are optional and unchecked by default; inspect their compatibility caveats before selecting them.
 
 Every radio page sets `IsRequired="true"` and `DefaultOption`, which AME requires for ISO
 injection. Current AME builds also enforce layout limits: a page with a `TopLine` or
@@ -671,55 +690,17 @@ Dark mode sets both Windows/app light-theme values to zero without recreating th
 - **Edge background off** — Startup Boost and Background Mode policies.
 - **Driver updates blocked** — prevents Windows Update from replacing vendor GPU drivers.
 
-## Bundled tool
+## Astra Gojo Toolbox
 
-`src/Executables/Astra-Max-Setup.exe` is the installer you provided. The playbook runs it with the NSIS silent switch:
+The toolbox checkbox deploys `Toolbox/Astra-Toolbox.exe` and its managed app to `C:\AstraMax\Toolbox`, copies its helpers to `C:\AstraMax`, ensures the bundled .NET Desktop Runtime 8 is available, and creates **Astra Toolbox** shortcuts on the Desktop and Start Menu. The retired Astra Max installer and old app are excluded from the archive.
 
-```yaml
-- !run: {exe: 'Astra-Max-Setup.exe', args: '/S', exeDir: true, wait: true, option: install-astra-max}
-```
+- **Overview and Tweaks** - the frosted-glass interface exposes 266 searchable tweaks across 22 categories: all 228 original definitions plus 38 reviewed additions.
+- **System** - bounded, read-only PC inventory, evidence-based advice, saved-value recovery and explicit Windows restore-point creation; unavailable sensors remain unavailable.
+- **Power, Games and Cleaner** - the original engine remains available behind explicit choices and risk confirmations; cleanup is not a reversible file backup.
+- **Wallpapers** - nine supplied images, previews and original static-wallpaper/fit restoration.
+- **Reviewed install-time choices** - 41 individually gated Windows/browser options, all unchecked by default, routed through the original-value snapshot engine; the EXM batch itself is never executed.
 
-The components checkbox is enabled by default; clear it to skip the tool.
-
-**Verify before distributing:**
-
-- The installer is **not digitally signed** (Authenticode `NotSigned`).
-- SHA256 of the bundled file: `96B7511A94655878645F140A6FB7A2A3640C1EF610ED30E6774E14998FC7004D`
-- It runs elevated as the signed-in user (`runas: currentUserElevated`), so a per-user
-  installer lands in that profile and not the service account. If it is repacked with
-  Inno Setup, change the args to `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
-- Only redistribute the tool if its license allows it.
-
-## Astra app
-
-The Astra checkbox deploys the bundled **Astra** performance suite, the only control panel the
-archive installs. `Tasks/astra-app.yml` copies `Astra.exe` (v1.6.4, 78 MB) to
-`C:\AstraMax\AstraTweaks\`, copies the helper scripts (`Verify.ps1`, `Restore.ps1`, `Cleanup.ps1`,
-`Network.ps1`, `Tweaks.ps1`, `QoL.ps1`) to `C:\AstraMax\`, and creates **Astra** shortcuts on the
-Desktop and in the Start Menu with the working directory set to the app folder.
-
-Captured from the real build (screenshots in `docs/assets`):
-
-- **Dashboard** - health score and 11 checks, live CPU/GPU temperature and load, VRAM, the running
-  Windows plan, and a Game Mode session that reverts at the next restart.
-- **Tuning** - 228 tweaks across 22 categories (All, with Starter 34, Aggressive 28, Absolute 85 and
-  Max 42 collections), hardware playbook chips for AMD/Intel CPU and GPU plus NVIDIA, a search box
-  and a live state per row. Each change stores its original value.
-- **Power presets** - four reversible plans on the Balanced template (Gaming, Light work, Ultimate,
-  Absolute), each stating its processor range and what it cannot do.
-- **Games** - a scanned library, a curated optimiser list with full profiles or in-game guides, and
-  frame presets from Quality through Viral potato.
-- **Cleaner** - curated temp and cache folders, GPU shader caches, then TRIM or defrag on the drive
-  you pick.
-- **Benchmark and latency lab** - local CPU, memory and disk scores plus DPC, interrupt and timer
-  latency measured on this PC.
-- **Restore & safety** - reverts a single tweak, a category or everything from the app's own
-  backups; nothing is meant to be permanent.
-
-The app is self-contained: settings live in `%LOCALAPPDATA%\AstraPC\settings.json`, applied
-tweak backups in `State\*.json`, per-game config backups under `Backups\Games`, and run logs in
-`Logs\astra.log`. A fresh Windows install therefore gets a working app without running an
-installer, and reverting its tweaks uses the app's own backup data.
+The original `Astra.Core.dll` is unchanged (SHA256 `6B5A4764FD855D990FCF37C9C9A3CCBD36ECDE97A2AAA8CC2A8A5D43C300EDC4`). Settings and snapshots retain the original `%LOCALAPPDATA%\AstraPC` location and identifiers. System recovery restores supported saved targets, not deleted apps, cache files or personal documents.
 
 | Helper | What it does |
 | --- | --- |
@@ -737,16 +718,12 @@ installer, and reverting its tweaks uses the app's own backup data.
 `Verify.ps1 -Json` prints the path of the report it wrote (`C:\AstraMax\last-report.json`), so it
 stays usable from other tooling.
 
-**Verify before distributing:**
+**Verification limits:**
 
-- `Astra.exe` is **not digitally signed** (Authenticode `NotSigned`).
-- SHA256 of the bundled build: `FE1B485143D4434F75B81E952D247EAF99E5ABCC70F06221125196EB0F542A76`
-- It is shipped unmodified. Confirm you have the right to redistribute it, and that the copy
-  in `src/Executables/AstraTweaks/` is the build you intend to ship.
-- The deploy step only copies files and writes shortcuts. The app was launched on Windows 11
-  during this release and its Dashboard, Tuning, Games, Power presets and Cleaner pages were
-  captured with no tweak applied. It has not been launched from an AME-injected image; test it
-  once on a clean VM.
+- The native launcher is unsigned; verify the archive hash and inspect the source rather than blindly bypassing warnings.
+- The final packaged app passed 378 isolated self-test checks from a path containing spaces. Native preview interactions, exact-value snapshot fixtures and mocked System/restore-point helpers passed without production tweaks or a real restore point.
+- Website images are actual native preview captures. Website interaction and responsive-layout checks passed; its visual screenshot capture was blocked by the hidden Qoder browser pane.
+- A full AME install on a clean VM, deployed live tweaks, real Windows restore-point creation and FPS claims remain untested.
 
 The earlier PowerShell/WPF shell is kept in `legacy/AstraCenter.ps1` for reference. It is no
 longer deployed or packaged.
@@ -758,9 +735,9 @@ powershell -ExecutionPolicy Bypass -File tools/validate.ps1
 powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
 
-`validate.ps1` parses `playbook.conf`, parses every PowerShell helper, and verifies that every `!task` include exists. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `AstraMax.apbx` unless `-Output` is given. The Astra V1 artifact built from this tree is `Astra-V1.apbx`, SHA256 `E4757A2C02E23049CE87310CFF7828B9822F7BAF61314E1B7A9CAB0F8F6CCD04`. The build refuses an archive that still contains the retired `PostInstall` menu.
+`validate.ps1` parses `playbook.conf`, checks page limits, parses every PowerShell helper, and verifies every `!task` include. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `Astra-V1.apbx` unless `-Output` is given. The public artifact is SHA256 `934F412D438C4E546D0340A3AC9167D219A987AA4A8AA505D733377EE36D9400`. The build excludes retired installers/apps, toolbox C# source and the commercial StartAllBack installer.
 
-The repository tracks `Astra-V1.apbx` and the bundled app `src/Executables/AstraTweaks/Astra.exe` through Git LFS (install Git LFS before cloning). Historical builds, `src/Executables/Astra-Max-Setup.exe`, the vendor installers in `src/Executables/Redist/`, `tools/7zr.exe` and the retired `legacy/` dashboard are excluded; supply those locally before running `build.ps1`, which fails its required-files check without them.
+`Astra-V1.apbx` is tracked through Git LFS. Toolbox source, compiled app and art live in `src/Executables/Toolbox`; use `tools/build-toolbox.ps1` to compile after source changes and `tools/package-toolbox.ps1` for standalone ZIPs. The vendor runtime installers in `src/Executables/Redist/` and `tools/7zr.exe` are gitignored and must be supplied locally to rebuild; the retired Astra Max installer is no longer required.
 
 The `.apbx` must be a **7z archive, AES-256 encrypted with password `malte`, with the file list encrypted** (`-mhe=on`). That is AME Wizard's convention; a plain zip is rejected at load with *"Playbook must be encrypted using 'malte' as the password."* `build.ps1` does this through the portable `tools/7zr.exe` (download it from https://www.7-zip.org/a/7zr.exe if missing) using the equivalent of:
 
@@ -781,23 +758,23 @@ If AME still refuses the file at load, check the message. `Playbook must be encr
 
 ## Verification status for Astra V1
 
-Astra V1 makes the StartAllBack build the single public release: page 39 still runs only when the box is ticked, downloads the official setup from startallback.com, verifies its Authenticode signature and executes it with `/install /elevated /silent` (three-minute guard), keeping the desktop and Start menu shortcut. The vendor installer is not redistributed; if the download or signature check fails, nothing runs and the shortcut opens the official page. The playbook version is reset to 1.0 for the V1 release. The progress screen keeps the Astra status line, the playbook thumbnail is the neon Astra "A", and the site header now uses the app's purple orb emblem with the serif ASTRA lockup, PERFORMANCE SUITE subtitle and MAX pill; the footer and playbook view reuse the emblem. `tools/validate.ps1` passes: `playbook.conf` parses as XML, every option name is unique, page limits hold across all 39 pages, every helper script parses, YAML has no quoted-backslash or here-string hazards and every `!task` include exists. `tools/test-new-options.ps1` passes end to end against temporary registry keys, including both directions of all eight extras toggles, the new progress line, and static checks that the StartAllBack helper downloads and verifies the official setup, uses the silent switches with a timeout and keeps the `.url` fallback. `tools/build.ps1` re-lists the archive with the password, confirms `playbook.conf` at the root, `Astra-Max-Setup.exe`, `AstraTweaks\Astra.exe` and the tasks inside, no `PostInstall` entry, no StartAllBack installer in the public build, unreadable headers without the password, and a clean integrity test.
+Public branding is Astra V1 and the internal playbook version remains 1.0. The archive contains the replacement Gojo toolbox, its unchanged original engine, System/restore-point helpers, nine wallpapers and 52 wizard pages. All 41 reviewed Windows/browser choices default to off; existing preset/security defaults are unchanged. StartAllBack remains an optional paid vendor download and is not redistributed.
 
-The screenshots on the site were captured from Astra 1.6.4 running on Windows 11 on this PC (Dashboard, Tuning, Games, Power presets, Cleaner) and from the bundled Astra Max Setup before its Install step. No tweak was applied and the setup was cancelled before installing.
+`tools/validate.ps1` passed XML, page-limit, PowerShell and YAML/reference checks. The packaged app passed 378 isolated checks; exact-value fixtures covered all 38 supplemental definitions, CLI fixtures checked all 41 apply/revert gates and restoration coverage, and native preview interactions passed. The encrypted APBX passed integrity/header checks, and selected configuration, binary and recovery-helper entries were extracted and matched against source hashes.
 
-Not executed for Astra V1: applying the archive through AME on a clean image or VM, the wizard's scripted changes from an injected image, the Astra app launched from an AME-deployed folder, the StartAllBack install path (the official setup was downloaded and its signature checked, but the installer was never run), game benchmarks and any claim about FPS. The site renders were checked from computed styles rather than a full browser screenshot, so the emblem and header lockup still need a visual pass in a browser. Earlier fixture results for `QoL.ps1`, `Security.ps1`, `Tweaks.ps1`, `HardwareTweaks.ps1` and `Debloat.ps1` were unchanged by this release. These are release checks, not claimed successes.
+The site uses actual final native Gojo toolbox screenshots and a 52-page read-only explorer. Browser download/hash, explorer and responsive-layout checks passed; a visual website capture remains unverified because the browser pane was hidden. No production tweak, real restore point, full AME installation, StartAllBack install or game benchmark was executed for this release.
 ## Smoke-test checklist (VM first)
 
-1. Wizard shows 39 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to personal live import, hardening to all three checked and Defender/VBS to disabled.
+1. Wizard shows 52 pages; preset defaults to Recommended, debloat/services to Light, wallpaper to Gojo, hardening to all three checked and Defender/VBS to disabled. All 41 reviewed Windows/browser options remain unchecked.
 2. Light run changes registry only; no services change.
 3. Recommended disables `DiagTrack`/`SysMain`; Extreme adds `WSearch`/`Spooler`; Insane adds `DoSvc`/`WpnService`.
-4. Desktop wallpaper changes to the selected Astra theme and survives a sign-out; the file exists at `C:\Windows\Web\Wallpaper\Astra\astra-wallpaper.png`.
+4. The gallery is copied to `Pictures\Astra\Wallpapers`; Gojo applies only when selected, Keep current does not change the desktop, and static apply/restore preserves the first saved wallpaper and fit under `%LOCALAPPDATA%\AstraPC`.
 5. Balanced power page sets `CPMINCORES=100` on AC and DC; other plans are untouched.
 6. Interrupt page logs GPU/NIC MSI hits; no device fails to boot after restart. Aggressive/Pinned set `DevicePolicy` 5/4 respectively.
 7. Network balanced leaves autotuning at `normal`; low latency adds the Nagle/NetBIOS values. `ipconfig /all` still shows a valid lease.
 8. DNS provider applies only to adapters with a gateway; DoH appears in `Get-DnsClientDohServerAddress` (Windows 11).
-9. Astra Max Setup runs silently and installs after the preset steps.
-10. The Astra shortcut opens `C:\AstraMax\AstraTweaks\Astra.exe` (v1.6.4); the dashboard reads the machine, Tuning lists 228 tweaks, a power preset applies and reverts, and Restore & safety is reachable. Log at `%LOCALAPPDATA%\AstraPC\Logs\astra.log`.
+9. Astra Toolbox is deployed after the runtime steps; the retired Astra Max installer is absent.
+10. The Astra Toolbox shortcut opens `C:\AstraMax\Toolbox\Astra-Toolbox.exe`; Tweaks lists 266 definitions, System reads the machine and exposes saved-state recovery, and explicit power/apply/restore actions work in the VM. Creating a real restore point must confirm a new uniquely described point rather than relying on a zero provider return code.
 11. With the network cable pulled, DirectX, Visual C++ and .NET Desktop 8 install from the bundled `Redist` folder; `.NET 3.5` succeeds or is skipped cleanly when no source is available. `Get-ChildItem 'C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App'` shows an 8.0.x folder.
 12. Siege/Fortnite shortcuts appear; running one after install reports detected exe and config paths.
 13. Game profiles preserve unrelated GPU tokens, skip absent games, refuse changes while the game is running, and restore original config values without touching anti-cheat or global capture.
@@ -823,8 +800,7 @@ user hive, so they cover accounts other than the one that ran the wizard. If the
 differ in your AME build, compare against the public Atlas/NOVA playbooks before shipping.
 ## Rollback
 
-Run `Restore.ps1` for everything the playbook changed (or use `Astra.exe` for its own
-backups). From a prompt:
+Use the toolbox's System recovery for supported saved tweak targets, or preview `Restore.ps1` and choose the sections to restore. These helpers do not restore deleted apps/files or every Windows change. From a prompt:
 
 - **Core parking:** `powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES 0` (and `setdcvalueindex`), then `powercfg /setactive SCHEME_CURRENT`.
 - **Interrupts:** Device Manager → device → Details → remove the `Affinity Policy` keys, or set `DevicePolicy=0`; reboot. Restoring `MSISupported=0` is only needed if a device misbehaves.
@@ -839,14 +815,14 @@ backups). From a prompt:
 - **Debloat:** `Debloat.ps1 -Restore` restores each service's exact snapshot startup type and prints the reinstall list; `wsreset -i` brings the Store back (Extreme). Apps are reinstalled from the Store, `winget`, or the exact package names in `C:\AstraMax\Debloat\removed.json` — for another account, install once and it becomes available to everyone. Removed provisioned copies are not restored automatically; a clean image is the only full reset.
 - **Services:** `Debloat.ps1 -Restore` replays `service-state.json`: Automatic, delayed Automatic, Manual and Disabled are restored exactly, and services that were running are started again. It also restores the 10 per-user templates from `user-service-state.json` (sign out/in to start them) and the previous `SvcHostSplitThresholdInKB` value from `kernel-state.json` (reboot to apply), then re-enables any optional feature recorded in `feature-state.json`. Service cache/report folders and stale per-user keys deleted by the service tier are not restored; Windows rebuilds the caches and recreates instance keys only when the service runs again. A single service can also be set back in `services.msc`.
 - **Steam launch options:** clear the field in Steam properties, or restore `localconfig.vdf.astra-backup` with Steam closed.
-- **Anything after install:** open **Astra** and use Restore & safety to revert a tweak, a category or everything, or run `Restore.ps1`. For Defender alone, `Security.ps1` and the wizard page are the documented paths.
+- **Saved toolbox tweaks:** open **Astra Toolbox → System** to inspect and restore supported original-value snapshots, or use `Restore.ps1 -Toolbox -Force` for the 41 reviewed install-time choices. Other playbook changes use their documented helpers; removal/cleanup is not restored by these snapshots.
 - **Game Bar capture:** Settings → Gaming → Captures → turn background recording back on.
 - **Everything else:** this is an AME playbook; re-image is the supported reset path.
 
 ## Customizing
 
-- **Swap the tool:** replace `src/Executables/Astra-Max-Setup.exe`, keep the name, or update `Tasks/tool.yml` and the required-files list in `tools/build.ps1`.
-- **Change the bundled app:** drop a new `src/Executables/AstraTweaks/Astra.exe`, update the version/signature notes in this README, and rebuild. The deploy task copies whatever is in that folder.
+- **Change the toolbox UI:** edit the C# sources in `src/Executables/Toolbox`, run `tools/build-toolbox.ps1`, validate the isolated/native fixtures, then rebuild the archive.
+- **Add a reviewed choice:** update the supplemental definition, fixed CLI/helper/restore whitelists, option-gated task and wizard page together; retain exact original-value restoration and run the consistency fixtures.
 - **Move tweaks between tiers:** edit `presets/*.yml`; keep the cumulative `!task` includes intact.
 - **Add a quality-of-life toggle:** add a `CheckboxOption` to a QoL page, a switch to `QoL.ps1`, and a gated `!powerShell` block in `Tasks/qol.yml`; extend `-AllOff` so Restore still works.
 - **Add a game profile:** copy `games/siege.yml`, add a `CheckboxOption` in `playbook.conf`, extend `GameProfiles.ps1` with a finder and config patcher.

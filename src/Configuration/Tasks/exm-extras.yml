@@ -1,0 +1,330 @@
+title: Reviewed EXM settings
+description: Applies selected settings through the toolbox's original-value backup engine, never executes the supplied batch
+actions:
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'qol.search-history-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-search-history
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-notification-sound-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-notification-sound
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-restart-sign-on-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-restart-sign-on
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'abs.app.chrome-background-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-background
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-online-spelling-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-spelling
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-geolocation-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-location
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'max.visual.wallpaper-full-quality'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-wallpaper-quality
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'sys-first-signin-animation-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: sys-first-signin-animation-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'sys-signin-account-details-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: sys-signin-account-details-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'sys-start-recent-apps-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: sys-start-recent-apps-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'sys-app-account-info-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: sys-app-account-info-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'sys-app-contacts-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: sys-app-contacts-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-search-suggestions-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-search-suggestions-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-network-prediction-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-network-prediction-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-third-party-cookies-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-third-party-cookies-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-website-notifications-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-website-notifications-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-translation-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-translation-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-download-location-prompt'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-download-location-prompt
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-cast-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-cast-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-memory-saver-on'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-memory-saver-on
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'chrome-low-battery-saver-on'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: chrome-low-battery-saver-on
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-settings-online-tips-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-settings-online-tips-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-store-push-install-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-store-push-install-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-message-cloud-sync-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-message-cloud-sync-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-sensors-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-sensors-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-serial-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-serial-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-bluetooth-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-bluetooth-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-webusb-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-webusb-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-feedback-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-feedback-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-chrome-spellchecking-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-chrome-spellchecking-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-calendar-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-calendar-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-email-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-email-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-messaging-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-messaging-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-phone-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-phone-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-diagnostics-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-diagnostics-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-call-history-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-call-history-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-tasks-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-tasks-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-notification-reading-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-notification-reading-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-radio-control-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-radio-control-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'exm-app-unpaired-device-sync-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: exm-app-unpaired-device-sync-off
+
+  - !powerShell:
+    command: |
+      & '.\Invoke-ToolboxTweak.ps1' -Id 'sys-app-motion-off'
+    exeDir: true
+    runas: currentUserElevated
+    wait: true
+    option: sys-app-motion-off

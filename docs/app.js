@@ -90,11 +90,10 @@ const PAGES = [
     options: ["Strip the remaining services (Insane — restorable from the snapshot)"],
   },
   {
-    n: 6, title: "Astra Max, the app and runtimes",
-    prompt: "Select Astra Max, the Astra app and game runtime frameworks to install. The DirectX, Visual C++ and .NET installers are bundled in the playbook, so they install offline; the Astra app is the control panel for every tweak, preset and clean-up, with Restore and safety to undo changes later.",
+    n: 6, title: "Astra Toolbox and runtimes",
+    prompt: "Install the new Gojo-themed Astra Toolbox and game runtimes. The toolbox replaces the old Astra Max interface and installer, retains all 228 original tweaks and their backups, and adds 38 reviewed settings for a total of 266. The frosted-glass/acrylic interface includes detailed System information, practical improvement checks and one-click Windows restore-point creation. It needs .NET Desktop Runtime 8 x64, installed from the bundled runtime if missing. The DirectX and Visual C++ installers are bundled for offline setup.",
     options: [
-      "Install Astra Max",
-      "Astra app (Desktop + Start Menu shortcut)",
+      "Astra Toolbox — Gojo UI, all tweaks and wallpaper gallery",
       "DirectX End-User Runtime June 2010 (bundled)",
       "Visual C++ 2005-2022 AIO, x86 + x64 (bundled)",
     ],
@@ -145,12 +144,12 @@ const PAGES = [
   },
   {
     n: 13, title: "Wallpaper",
-    prompt: "Personal artwork is imported locally, never bundled. Live builds a lightweight native host from personal-wallpaper.png plus hair-motion.json and adds hair sway with a red/blue glow pulse on the primary screen. Missing personal files leave the current wallpaper unchanged; rerun the wallpaper step after importing them.",
+    prompt: "The nine-image wallpaper pack is copied to Pictures\\Astra\\Wallpapers. Gojo is the default desktop theme; the toolbox can preview and apply the other supplied images later. Keep current only copies the gallery. Personal static/live imports remain local and need personal-wallpaper.png (plus hair-motion.json for the native live host). Static wallpaper changes save the previous background and fit for restore.",
     options: [
-      "Red and purple (crimson rim, magenta and violet dust)",
-      "Midnight blue (violet and blue accretion stream)",
+      "Gojo — Hollow Purple (bundled static wallpaper)",
+      "Keep my current wallpaper; copy the gallery only",
       "Import my personal static wallpaper",
-      "Install Lively and apply my personal live wallpaper",
+      "Apply my personal live wallpaper (lightweight native host)",
     ],
   },
   {
@@ -363,6 +362,71 @@ const PAGES = [
     prompt: "StartAllBack is a paid third-party Start menu and taskbar add-on with a per-user license (startallback.com). Ticking this downloads the official signed setup from startallback.com, installs it silently and adds an install shortcut to the desktop and Start menu. If the download or signature check fails, the shortcut opens the official page. Astra never redistributes the installer and does not cover StartAllBack in Restore.ps1. It changes the shell, not the search index: use the search options above to lighten Start search itself.",
     options: ["StartAllBack — download and install the official setup (paid add-on)"],
   },
+  {
+    n: 40, title: "Reviewed EXM Windows settings",
+    prompt: "Reviewed EXM Windows settings, optional and reversible from Astra Toolbox or Restore.ps1 -Toolbox. Search history collection off does not erase existing history; silent notifications keep banners; automatic restart sign-on off may defer update setup until you sign in manually. These settings require the bundled .NET Desktop Runtime 8 when applied.",
+    options: ["Do not collect device search history", "Silent notifications (keep banners)", "Disable automatic restart sign-on"],
+  },
+  {
+    n: 41, title: "Chrome and wallpaper settings",
+    prompt: "Reviewed EXM Chrome and wallpaper settings, all optional. Chrome background apps off stops background extensions after the last window closes; online spelling off keeps local spellcheck; location blocked breaks location-dependent websites. Restart Chrome and check chrome://policy. JPEG wallpaper quality 100 affects JPEG import only, not FPS. Original registry values are saved by the toolbox engine for exact restore; the bundled .NET Desktop Runtime 8 is required.",
+    options: ["Stop Chrome background apps after closing Chrome", "Disable Chrome online spellcheck (keep local)", "Block Chrome website location by default", "JPEG wallpaper import quality 100"],
+  },
+  {
+    n: 42, title: "Sign-in and Start preferences",
+    prompt: "Optional Windows sign-in and Start preferences. Skip first-sign-in animation only affects new accounts and also suppresses Microsoft-account service opt-in prompts; hiding account details is not anonymity; hiding Recently added keeps applications installed. Policies may be ignored on Home or overridden by organization policy. Original values are saved for restore inside Astra System.",
+    options: ["Skip the first-sign-in animation", "Hide additional account details at sign-in", "Hide recently installed apps in Start (restart required)"],
+  },
+  {
+    n: 43, title: "Account and contacts permissions",
+    prompt: "Optional Windows-app privacy restrictions. Account-information and contacts access are denied by default, which can break identity, personalization or contacts features. Per-app exceptions take precedence and arbitrary desktop programs are not universally covered. Pro, Enterprise, Education and IoT policies may be ignored on Home; organization policy can override them. Restart affected apps; original values can be restored inside Astra System.",
+    options: ["Deny Windows-app account-information access", "Deny Windows-app contacts access"],
+  },
+  {
+    n: 44, title: "Chrome privacy and notifications",
+    prompt: "Optional Chrome privacy and notification choices. Online search suggestions off retains local history and bookmarks; speculative connections off may slow websites; blocking third-party cookies can break embedded sign-in; website alerts may be unavailable when notifications are blocked. Restart Chrome and check chrome://policy for acceptance. Existing site exceptions may still matter. Windows notifications and browser security checks remain unchanged; original registry values are saved.",
+    options: ["Disable Chrome online search suggestions", "Disable Chrome speculative connections", "Block Chrome third-party cookies", "Block Chrome website notifications by default"],
+  },
+  {
+    n: 45, title: "Chrome features and memory",
+    prompt: "Optional Chrome features and memory preferences. Translation off removes the feature, not just prompts; asking where to save adds a dialog to every download; Google Cast off removes casting and requires restarting Chrome; Memory Saver discards eligible inactive tabs, which may reload when revisited (Chrome 108 or newer). Check chrome://policy for acceptance; Chrome may show managed settings. These are preferences, not guaranteed FPS gains, and their original registry values can be restored.",
+    options: ["Disable Chrome built-in translation", "Ask where to save Chrome downloads", "Disable Google Cast in Chrome", "Enable Chrome Memory Saver"],
+  },
+  {
+    n: 46, title: "Chrome Energy Saver",
+    prompt: "Optional Chrome Energy Saver (Chrome 108 or newer). Activates on low battery and throttles browser frame rate to reduce power consumption; this is not a desktop-performance boost. Refresh Chrome policy or restart, and check chrome://policy for acceptance. Chrome may show managed settings. Original registry values are saved for restore inside Astra System.",
+    options: ["Enable Chrome Energy Saver at low battery"],
+  },
+  {
+    n: 47, title: "Settings, Store and message preferences",
+    prompt: "Optional Windows Settings, Store and message preferences. Online tips off reduces online Settings help, not promotional tips; reopen Settings. Remote Store installation off keeps local installs and updates. Message cloud backup off only affects the applicable cellular-message feature, not general Phone Link, email or messaging. Pro, Enterprise, Education and IoT policies may be ignored on Home or overridden by organization policy. Original values are saved for restore inside Astra System.",
+    options: ["Disable online tips in Windows Settings", "Block remote Microsoft Store app installation", "Disable cellular-message cloud backup and restore"],
+  },
+  {
+    n: 48, title: "Chrome website device permissions",
+    prompt: "Optional Chrome website device permissions, blocked by default when selected. Sensor-dependent sites and browser serial, Bluetooth or USB workflows can break; applicable site-policy exceptions may override defaults. Normal Windows sensors, COM ports, Bluetooth, headsets and USB hardware remain enabled. Minimum Chrome versions: sensors 88, Serial 86, Bluetooth 50, WebUSB 67. Restart Chrome and check chrome://policy for acceptance; Chrome may show managed settings. Original values are saved for restore inside Astra System.",
+    options: ["Block Chrome website sensor access by default", "Block Chrome Web Serial requests by default", "Block Chrome Web Bluetooth requests by default", "Block Chrome WebUSB requests by default"],
+  },
+  {
+    n: 49, title: "Chrome feedback and spellchecking",
+    prompt: "Optional Chrome feedback and spelling preferences. Report an Issue off (Chrome 77+) removes the command and shortcut, not all browser metrics. All spellchecking off (Chrome 65+) loses local dictionaries, spelling suggestions and related accessibility assistance; choose the earlier online-only spellcheck option to keep local checking. Restart Chrome and check chrome://policy for acceptance; Chrome may show managed settings. No gaming gain is promised. Original values are saved for restore inside Astra System.",
+    options: ["Hide Chrome's Report an Issue command", "Disable all Chrome spellchecking (including local)"],
+  },
+  {
+    n: 50, title: "Windows-app personal-data permissions",
+    prompt: "Optional Windows-app personal-data permissions, denied by default when selected. Calendar, mail, text/MMS and calling integrations can fail; existing calendar data and mail are not deleted and phone hardware stays enabled. These are AppPrivacy defaults, not direct ConsentStore edits; per-app policy exceptions override defaults and arbitrary Win32 apps are not universally covered. The corresponding user choices are locked while configured. Pro, Enterprise, Education and IoT policies may be ignored on Home or overridden by organization policy. Restart affected apps; original values are saved for restore inside Astra System.",
+    options: ["Deny Windows-app calendar access by default", "Deny Windows-app email access by default", "Deny Windows-app text/MMS reading and sending by default", "Deny Windows-app phone-call access by default"],
+  },
+  {
+    n: 51, title: "Windows-app diagnostics and history",
+    prompt: "Optional Windows-app diagnostic, history, task and notification access restrictions. Other-app diagnostic, call-history, task-list and notification-reading integrations can fail. These do not disable Windows telemetry, error reporting, diagnostic services, scheduled tasks or ordinary notification banners/sounds; history and task lists are not erased. AppPrivacy defaults lock the corresponding user choices; per-app policy exceptions override defaults and arbitrary Win32 apps are not universally covered. Pro, Enterprise, Education and IoT policies may be ignored on Home or overridden by organization policy. Restart affected apps; original values are saved for restore inside Astra System.",
+    options: ["Deny Windows-app access to other-app diagnostics", "Deny Windows-app call-history access by default", "Deny Windows-app task-data access by default", "Deny Windows-app notification-reading access"],
+  },
+  {
+    n: 52, title: "Windows-app device and motion permissions",
+    prompt: "Optional Windows-app device and motion permissions. Radio-control, unpaired wireless-device and motion-dependent integrations can fail; Wi-Fi/Bluetooth drivers and normal hardware stay enabled. Unpaired-device communication is not a trusted-devices policy. Motion access is a documented extra, not a proven equivalent of EXM's activity entry or Windows Activity History suppression. AppPrivacy defaults lock the corresponding user choices; per-app policy exceptions override defaults and arbitrary Win32 apps are not universally covered. Pro, Enterprise, Education and IoT policies may be ignored on Home or overridden by organization policy. Restart affected apps; original values are saved for restore inside Astra System.",
+    options: ["Deny Windows-app control of radios", "Deny Windows-app unpaired-device communication", "Deny Windows-app motion-data access (documented extra)"],
+  },
 ];
 
 const GROUPS = [
@@ -376,6 +440,10 @@ const GROUPS = [
   { title: "Shell and quality of life", from: 22, to: 32 },
   { title: "Security", from: 33, to: 36 },
   { title: "Astra extras", from: 37, to: 39 },
+  { title: "Reviewed EXM settings", from: 40, to: 41 },
+  { title: "Windows preferences", from: 42, to: 43 },
+  { title: "Chrome preferences", from: 44, to: 46 },
+  { title: "More reviewed settings", from: 47, to: 52 },
 ];
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -402,6 +470,7 @@ function renderPlaybook() {
     for (const page of PAGES.filter((p) => p.n >= group.from && p.n <= group.to)) {
       const card = document.createElement("article");
       card.className = "pb-card";
+      card.dataset.search = `${page.title} ${page.prompt} ${page.options.join(" ")}`.toLowerCase();
 
       const cardHead = document.createElement("div");
       cardHead.className = "pb-card-head";
@@ -451,7 +520,7 @@ function dustBurst() {
   if (reduceMotion.matches) return;
   const layer = document.createElement("div");
   layer.className = "snap-layer";
-  const colors = ["#ec2d7a", "#d02be0", "#ff9ad5", "#f4d9ff", "#ffffff"];
+  const colors = ["#b6e9ff", "#b9adff", "#d6f4ff", "#d6ccff", "#ffffff"];
   for (let i = 0; i < 150; i++) {
     const dot = document.createElement("i");
     const angle = Math.random() * Math.PI * 2;
@@ -534,4 +603,66 @@ if (siteView && playbookView && openButton && backButton) {
       swapView(playbookView, siteView, openButton);
     }
   });
+  document.getElementById("explore-pages")?.addEventListener("click", () => openButton.click());
+  document.getElementById("pb-home")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    backButton.click();
+  });
+}
+
+const screens = {
+  overview: { file: "astra-glass-overview.png", alt: "Astra toolbox Overview in non-mutating preview mode.", caption: "Your workspace: the tweak library, System and the tools you actually use." },
+  system: { file: "astra-glass-system.png", alt: "Astra System page with hardware details and Windows restore-point controls in preview mode.", caption: "System: hardware and Windows evidence, improvement checks, restore points and saved tweak backups." },
+  tweaks: { file: "astra-glass-tweaks.png", alt: "The Astra tweak library with searchable, individually selectable settings and original-value snapshots.", caption: "The library: search, review the caveat, and choose an individual change. No blanket optimization button." },
+  wallpapers: { file: "astra-glass-wallpapers.png", alt: "Astra's nine-wallpaper library and preview, with application disabled in preview mode.", caption: "Your backdrop: nine wallpapers, an actual preview and separate original-desktop restoration." },
+};
+const screenTabs = [...document.querySelectorAll("[data-screen]")];
+function selectScreen(tab, focus = false) {
+  const screen = screens[tab.dataset.screen];
+  if (!screen) return;
+  screenTabs.forEach((item) => {
+    item.setAttribute("aria-selected", String(item === tab));
+    item.tabIndex = item === tab ? 0 : -1;
+  });
+  const image = document.getElementById("screen-image");
+  image.src = `assets/${screen.file}`;
+  image.alt = screen.alt;
+  document.getElementById("screen-caption").textContent = screen.caption;
+  document.getElementById("screen-panel").setAttribute("aria-labelledby", tab.id);
+  if (focus) tab.focus();
+}
+screenTabs.forEach((tab, index) => {
+  tab.addEventListener("click", () => selectScreen(tab));
+  tab.addEventListener("keydown", (event) => {
+    let target;
+    if (event.key === "ArrowRight") target = (index + 1) % screenTabs.length;
+    if (event.key === "ArrowLeft") target = (index + screenTabs.length - 1) % screenTabs.length;
+    if (event.key === "Home") target = 0;
+    if (event.key === "End") target = screenTabs.length - 1;
+    if (target === undefined) return;
+    event.preventDefault();
+    selectScreen(screenTabs[target], true);
+  });
+});
+
+const pageSearch = document.getElementById("page-search");
+function filterPages() {
+  const query = pageSearch.value.trim().toLowerCase();
+  let visible = 0;
+  document.querySelectorAll(".pb-group").forEach((group) => {
+    let count = 0;
+    group.querySelectorAll(".pb-card").forEach((card) => {
+      const matches = card.dataset.search.includes(query);
+      card.hidden = !matches;
+      if (matches) count++;
+    });
+    group.hidden = count === 0;
+    visible += count;
+  });
+  document.getElementById("page-results").textContent = `${visible} of ${PAGES.length} pages`;
+  document.getElementById("page-empty").hidden = visible !== 0;
+}
+if (pageSearch) {
+  pageSearch.addEventListener("input", filterPages);
+  filterPages();
 }
