@@ -75,6 +75,54 @@ namespace Astra.Toolbox
         public bool Available { get { return System.IO.File.Exists(FullPath); } }
     }
 
+    internal enum AppearanceMode { Light, Dark, HollowPurple }
+
+    internal sealed class ToolboxAppearance
+    {
+        public AppearanceMode Mode = AppearanceMode.Light;
+        public string WallpaperId;
+        public string LoadError;
+        private readonly string path;
+
+        private ToolboxAppearance(string filePath) { path = filePath; }
+
+        public static ToolboxAppearance Load(string path)
+        {
+            var appearance = new ToolboxAppearance(path);
+            if (path == null || !File.Exists(path)) return appearance;
+            try
+            {
+                using (var document = JsonDocument.Parse(File.ReadAllText(path)))
+                {
+                    JsonElement value;
+                    var root = document.RootElement;
+                    if (root.ValueKind != JsonValueKind.Object) throw new JsonException("Expected appearance settings.");
+                    AppearanceMode mode;
+                    if (root.TryGetProperty("Theme", out value) && value.ValueKind == JsonValueKind.String && Enum.TryParse(value.GetString(), out mode) && Enum.IsDefined(typeof(AppearanceMode), mode)) appearance.Mode = mode;
+                    if (root.TryGetProperty("WallpaperId", out value) && value.ValueKind == JsonValueKind.String) appearance.WallpaperId = value.GetString();
+                }
+            }
+            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException || error is JsonException)
+            {
+                appearance.LoadError = "Appearance settings could not be read; using defaults. " + error.Message;
+            }
+            return appearance;
+        }
+
+        public void Save()
+        {
+            if (path == null) return;
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(new { Theme = Mode.ToString(), WallpaperId }));
+            File.Move(path + ".tmp", path, true);
+        }
+
+        public WallpaperEntry ResolveWallpaper(IEnumerable<WallpaperEntry> library)
+        {
+            return library.FirstOrDefault(entry => entry.Id == WallpaperId && entry.Available);
+        }
+    }
+
     internal sealed partial class ToolboxSession
     {
         public readonly List<TweakDefinition> Catalog;
@@ -488,10 +536,104 @@ namespace Astra.Toolbox
         public const string Error = "#963E42";
         public const string Success = "#1B626D";
         public static readonly FontFamily Font = new FontFamily("Segoe UI Variable, Segoe UI, Arial");
+        public static AppearanceMode Mode { get; private set; }
+        private static readonly Dictionary<string, string[]> palettes = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            { Background, new[] { "#101722", "#100B23" } },
+            { Sidebar, new[] { "#DB16202D", "#E31B113A" } },
+            { Surface, new[] { "#D01B2635", "#D624174A" } },
+            { Ink, new[] { "#EDF3FB", "#F8F3FF" } },
+            { Secondary, new[] { "#B8C8D8", "#D2C3EB" } },
+            { Accent, new[] { "#B7A4FF", "#D59AFF" } },
+            { Blue, new[] { "#7CBFFF", "#BCABFF" } },
+            { Line, new[] { "#648AA1BC", "#648D65B8" } },
+            { Warning, new[] { "#FFC88A", "#FFD08F" } },
+            { Error, new[] { "#FF9C9C", "#FFA1C1" } },
+            { Success, new[] { "#7CDFC4", "#91EBCF" } },
+            { "#CFF3F9FF", new[] { "#EC273446", "#EC342254" } },
+            { "#8AC7D9EB", new[] { "#DE172131", "#DE1B1233" } },
+            { "#FAFFFFFF", new[] { "#AB8DA7C6", "#B9BA8DDD" } },
+            { "#BEE9F9FF", new[] { "#6E58718D", "#7B825BA8" } },
+            { "#707B9BB9", new[] { "#40455771", "#405B397F" } },
+            { "#D0E8F9FF", new[] { "#7D526980", "#7D9163B8" } },
+            { "#95DDEBF5", new[] { "#BD152236", "#BD24103E" } },
+            { "#60A8BBD3", new[] { "#9E141B2A", "#9E190D30" } },
+            { "#90B5C8DF", new[] { "#BD1C2440", "#BD341653" } },
+            { "#E5F6FAFF", new[] { "#D0152236", "#D024103E" } },
+            { "#E6F1F7FD", new[] { "#D0141B2A", "#D0190D30" } },
+            { "#E5F1F8FF", new[] { "#D01C2440", "#D0341653" } },
+            { "#70F3FCFF", new[] { "#283B79C1", "#485F45DE" } },
+            { "#38918FCC", new[] { "#304D4593", "#658B39CB" } },
+            { "#30466EBC", new[] { "#303D66AD", "#404D2E9B" } },
+            { "#75D9F7FF", new[] { "#4D669EC3", "#698B68D8" } },
+            { "#277B70AE", new[] { "#274B427D", "#476D249A" } },
+            { "#60E6E0FF", new[] { "#407E69B4", "#70C57DEB" } },
+            { "#65F1FBFF", new[] { "#28608EC3", "#508F6BDD" } },
+            { "#D9F6FBFF", new[] { "#EE263449", "#EE34234F" } },
+            { "#ABE0EBF5", new[] { "#DF1C293B", "#DF271A42" } },
+            { "#B8D0E1F1", new[] { "#E1182232", "#E1201638" } },
+            { "#F6F4FAFF", new[] { "#FF243248", "#FF312047" } },
+            { "#F6DCE8F5", new[] { "#FF192436", "#FF211536" } },
+            { "#879EB8", new[] { "#627893", "#8A6CA8" } },
+            { "#70F1FBFF", new[] { "#404F6B8D", "#407F55AC" } },
+            { "#506F92", new[] { "#94B3D6", "#C093E5" } },
+            { "#8DAACBE8", new[] { "#8D526EAA", "#8D704BAB" } },
+            { "#50FFFFFF", new[] { "#405B7392", "#407F5C9D" } },
+            { "#7D9BB9", new[] { "#809ABA", "#AC81CC" } },
+            { "#E6F2F9FF", new[] { "#FF2F4058", "#FF43265F" } },
+            { "#8CBFCFDF", new[] { "#C9212C3D", "#C92C1E40" } },
+            { "#BCD1E3F4", new[] { "#FF374963", "#FF493067" } },
+            { "#8198BC", new[] { "#91A9CB", "#BF93E0" } },
+            { "#DFF3FAFF", new[] { "#FF3A4E6B", "#FF553174" } },
+            { "#D9F1F8FF", new[] { "#FF30415B", "#FF40245E" } },
+            { "#2B4464", new[] { "#080C13", "#090511" } },
+            { "#809AB6", new[] { "#8AA1BF", "#B28FCB" } },
+            { "#20F3FAFF", new[] { "#202B3D57", "#203F255D" } },
+            { "#70F3FAFF", new[] { "#702B3D57", "#7049266B" } },
+            { "#A0FFFFFF", new[] { "#A0849FC1", "#A0BC86DD" } },
+            { "#50D0E6F8", new[] { "#80314460", "#80472966" } },
+            { "#3F5794", new[] { "#5F50B5", "#7136BE" } },
+            { "#31447D", new[] { "#3D3579", "#4D248C" } },
+            { "#97BDE6FF", new[] { "#978F94E3", "#97CD94FF" } },
+            { "#40FFFFFF", new[] { "#405E7899", "#40916CBA" } },
+            { "#28FFFFFF", new[] { "#285F789B", "#289A63CA" } },
+            { "#E8FFFFFF", new[] { "#C899B5D8", "#C8CEA1EF" } },
+            { "#20304970", new[] { "#402A1F56", "#40250D43" } },
+            { "#7394B5", new[] { "#99AACE", "#C995E6" } },
+            { "#A4ADBE", new[] { "#8CA1BA", "#AE91C6" } },
+            { "#C7D5E9FA", new[] { "#E6374967", "#E6452865" } },
+            { "#DDE2EFFA", new[] { "#ED172439", "#ED23113C" } },
+            { "#ADC8DCF1", new[] { "#B5223048", "#B5391E55" } },
+            { "#20D7EAFA", new[] { "#2022334F", "#20462965" } },
+            { "#08D7EAFA", new[] { "#0822334F", "#08462965" } },
+            { "#DDE6EFF8", new[] { "#EB233149", "#EB311D50" } },
+            { "#8AAECE", new[] { "#88A1BD", "#B790D0" } },
+            { "#D0EAF4FC", new[] { "#E62B3A52", "#E63C255A" } },
+            { "#7CB9CFE4", new[] { "#D41D293A", "#D4281940" } },
+            { "#D0CDE5F8", new[] { "#E63C4E6D", "#E64D2C70" } },
+            { "#80BED1E5", new[] { "#CF1E2B3E", "#CF2C1B45" } },
+            { "#C2D3E8F9", new[] { "#E42D4059", "#E4442864" } }
+        };
 
+        public static void SetMode(AppearanceMode mode) { Mode = mode; buttonTemplate = null; }
+        private static string PaletteColor(string color)
+        {
+            string[] shades;
+            return Mode != AppearanceMode.Light && palettes.TryGetValue(color, out shades) ? shades[(int)Mode - 1] : color;
+        }
+        private static string PaletteXaml(string xaml)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(xaml, "#[0-9A-Fa-f]{8}\\b|#[0-9A-Fa-f]{6}\\b", match => PaletteColor(match.Value));
+        }
+        public static void Refresh(Window window)
+        {
+            window.Foreground = Brush(Ink);
+            window.Resources.MergedDictionaries[0] = ControlResources();
+            TryNativeSurface(window);
+        }
         public static SolidColorBrush Brush(string color)
         {
-            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)); brush.Freeze(); return brush;
+            var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(PaletteColor(color))); brush.Freeze(); return brush;
         }
         public static TextBlock Text(string text, double size, string color, FontWeight weight)
         {
@@ -546,8 +688,11 @@ namespace Astra.Toolbox
             {
                 try
                 {
-                    int light = 0, rounded = 2, caption = 0x00D9C8B7, text = 0x00462D17;
-                    DwmSetWindowAttribute(handle, 20, ref light, sizeof(int));
+                    var captionColor = Brush(Background).Color; var textColor = Brush(Ink).Color;
+                    int dark = Mode == AppearanceMode.Light ? 0 : 1, rounded = 2;
+                    int caption = captionColor.R | (captionColor.G << 8) | (captionColor.B << 16);
+                    int text = textColor.R | (textColor.G << 8) | (textColor.B << 16);
+                    DwmSetWindowAttribute(handle, 20, ref dark, sizeof(int));
                     DwmSetWindowAttribute(handle, 33, ref rounded, sizeof(int));
                     DwmSetWindowAttribute(handle, 35, ref caption, sizeof(int));
                     DwmSetWindowAttribute(handle, 36, ref text, sizeof(int));
@@ -594,14 +739,16 @@ namespace Astra.Toolbox
             return new Border { Child = child, Background = Frost(), BorderBrush = Rim(), BorderThickness = new Thickness(1), CornerRadius = new CornerRadius(radius), Padding = padding,
                 Effect = depth && !SystemParameters.HighContrast && (RenderCapability.Tier >> 16) > 0 ? new DropShadowEffect { Color = Color.FromRgb(43, 68, 100), BlurRadius = 16, ShadowDepth = 4, Opacity = 0.12, RenderingBias = RenderingBias.Performance } : null };
         }
-        public static Grid Stage(UIElement child)
+        public static Grid Stage(UIElement child, ImageSource wallpaper = null)
         {
             var stage = new Grid { ClipToBounds = true };
             var wash = new LinearGradientBrush { StartPoint = new Point(0, 0), EndPoint = new Point(1, 1) };
-            wash.GradientStops.Add(new GradientStop(Brush("#95DDEBF5").Color, 0));
-            wash.GradientStops.Add(new GradientStop(Brush("#60A8BBD3").Color, 0.5));
-            wash.GradientStops.Add(new GradientStop(Brush("#90B5C8DF").Color, 1));
-            wash.Freeze(); stage.Background = wash;
+            wash.GradientStops.Add(new GradientStop(Brush(wallpaper != null ? "#E5F6FAFF" : "#95DDEBF5").Color, 0));
+            wash.GradientStops.Add(new GradientStop(Brush(wallpaper != null ? "#E6F1F7FD" : "#60A8BBD3").Color, 0.5));
+            wash.GradientStops.Add(new GradientStop(Brush(wallpaper != null ? "#E5F1F8FF" : "#90B5C8DF").Color, 1));
+            wash.Freeze(); stage.Background = Brushes.Transparent;
+            if (wallpaper != null) stage.Children.Add(new Image { Name = "ToolboxWallpaperBackground", Source = wallpaper, Stretch = Stretch.UniformToFill, IsHitTestVisible = false, Focusable = false });
+            stage.Children.Add(new Border { Background = wash, IsHitTestVisible = false });
             var drawing = new DrawingGroup();
             var glow = new RadialGradientBrush(Brush("#70F3FCFF").Color, Colors.Transparent) { Center = new Point(0.4, 0.35), GradientOrigin = new Point(0.4, 0.35) }; glow.Freeze();
             drawing.Children.Add(new GeometryDrawing(glow, null, new EllipseGeometry(new Point(260, 150), 470, 340)));
@@ -611,7 +758,7 @@ namespace Astra.Toolbox
             AddRibbon(drawing, "M 90,-80 C 380,60 380,330 760,180 C 1060,40 940,640 1350,580", "#277B70AE", "#60E6E0FF", 12);
             drawing.Freeze();
             var decoration = new System.Windows.Shapes.Rectangle { Fill = new DrawingBrush(drawing) { Stretch = Stretch.Fill }, IsHitTestVisible = false, Focusable = false };
-            Panel.SetZIndex(decoration, -1); stage.Children.Add(decoration); stage.Children.Add(child); return stage;
+            stage.Children.Add(decoration); stage.Children.Add(child); return stage;
         }
         private static void AddRibbon(DrawingGroup drawing, string path, string shade, string light, double width)
         {
@@ -625,7 +772,7 @@ namespace Astra.Toolbox
 
         private static ResourceDictionary ControlResources()
         {
-            return (ResourceDictionary)XamlReader.Parse("""
+            return (ResourceDictionary)XamlReader.Parse(PaletteXaml("""
                 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
                   <LinearGradientBrush x:Key="FieldGlass" StartPoint="0,0" EndPoint="0,1">
                     <GradientStop Color="#D9F6FBFF" Offset="0"/><GradientStop Color="#ABE0EBF5" Offset="0.45"/><GradientStop Color="#B8D0E1F1" Offset="1"/>
@@ -763,8 +910,8 @@ namespace Astra.Toolbox
                       </Grid>
                       <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Box" Property="BorderBrush" Value="#216BA6"/></Trigger>
-                        <Trigger Property="IsChecked" Value="True"><Setter TargetName="Box" Property="Background" Value="#465DA8"/><Setter TargetName="Box" Property="BorderBrush" Value="#465DA8"/><Setter TargetName="Tick" Property="Visibility" Value="Visible"/></Trigger>
-                        <Trigger Property="IsChecked" Value="{x:Null}"><Setter TargetName="Box" Property="Background" Value="#465DA8"/><Setter TargetName="Mixed" Property="Visibility" Value="Visible"/></Trigger>
+                        <Trigger Property="IsChecked" Value="True"><Setter TargetName="Box" Property="Background" Value="#3F5794"/><Setter TargetName="Box" Property="BorderBrush" Value="#465DA8"/><Setter TargetName="Tick" Property="Visibility" Value="Visible"/></Trigger>
+                        <Trigger Property="IsChecked" Value="{x:Null}"><Setter TargetName="Box" Property="Background" Value="#3F5794"/><Setter TargetName="Mixed" Property="Visibility" Value="Visible"/></Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="CheckFocus" Property="BorderBrush" Value="#216BA6"/></Trigger>
                         <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.48"/></Trigger>
                       </ControlTemplate.Triggers>
@@ -796,7 +943,7 @@ namespace Astra.Toolbox
                     </ControlTemplate></Setter.Value></Setter>
                   </Style>
                 </ResourceDictionary>
-                """);
+                """));
         }
 
         public static Brush ButtonFill(bool primary)
@@ -812,7 +959,7 @@ namespace Astra.Toolbox
         private static ControlTemplate buttonTemplate;
         public static ControlTemplate ButtonTemplate()
         {
-            return buttonTemplate ??= (ControlTemplate)XamlReader.Parse("""
+            return buttonTemplate ??= (ControlTemplate)XamlReader.Parse(PaletteXaml("""
                 <ControlTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" TargetType="Button">
                   <Border x:Name="ButtonBorder" CornerRadius="9" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                     <Grid>
@@ -831,7 +978,7 @@ namespace Astra.Toolbox
                     <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ButtonBorder" Property="Opacity" Value="0.48"/></Trigger>
                   </ControlTemplate.Triggers>
                 </ControlTemplate>
-                """);
+                """));
         }
         public static Border Card(UIElement child)
         {
@@ -854,11 +1001,14 @@ namespace Astra.Toolbox
     {
         private readonly ToolboxSession session;
         private readonly Options options;
-        private readonly ContentControl content = new ContentControl();
+        private ContentControl content;
         private readonly Dictionary<string, Button> navigation = new Dictionary<string, Button>(StringComparer.Ordinal);
-        private readonly TextBlock notification = Theme.Text("No changes run on startup. Choose a setting to review it.", 12, Theme.Secondary, FontWeights.Normal);
-        private readonly TextBlock sectionLabel = Theme.Text("Overview", 13, Theme.Ink, FontWeights.SemiBold);
-        private readonly TextBlock mode;
+        private TextBlock notification;
+        private TextBlock sectionLabel;
+        private readonly ToolboxAppearance appearance;
+        private readonly BitmapImage avatar;
+        private BitmapImage toolboxWallpaper;
+        private ComboBox themeSelector;
         private bool busy;
         private bool loaded;
         private string page;
@@ -875,6 +1025,9 @@ namespace Astra.Toolbox
         private Image wallpaperPreview;
         private TextBlock wallpaperTitle;
         private Button wallpaperApply;
+        private Button toolboxWallpaperApply;
+        private Button toolboxWallpaperClear;
+        private TextBlock toolboxWallpaperStatus;
         private readonly Dictionary<string, Button> wallpaperButtons = new Dictionary<string, Button>(StringComparer.Ordinal);
         private readonly Dictionary<CleanCategoryKind, CheckBox> cleanSelection = new Dictionary<CleanCategoryKind, CheckBox>();
         private bool cleanerScanned;
@@ -886,13 +1039,17 @@ namespace Astra.Toolbox
             session = state; options = arguments;
             Title = "Astra Toolbox"; Width = 1160; Height = 800; MinWidth = 900; MinHeight = 650;
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            Theme.Apply(this);
-            var icon = Theme.Image(Path.Combine(AppContext.BaseDirectory, "Assets", "gojo-icon.png"), 96); if (icon != null) Icon = icon;
-            mode = Theme.Text(session.ReadOnly ? "Preview · read only" : (session.Admin.IsAdministrator ? "Elevated session" : "Standard user"), 11, Theme.Accent, FontWeights.SemiBold);
+            appearance = ToolboxAppearance.Load(session.ReadOnly ? null : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AstraPC", "State", "toolbox-appearance.json"));
+            Theme.SetMode(appearance.Mode); Theme.Apply(this);
+            avatar = Theme.Image(Path.Combine(AppContext.BaseDirectory, "Assets", "gojo-icon.png"), 96); if (avatar != null) Icon = avatar;
             try { wallpapers = ToolboxSession.LoadWallpapers(); }
             catch (Exception error) { wallpaperError = error.Message; }
-            BuildShell(icon);
+            var background = appearance.ResolveWallpaper(wallpapers);
+            toolboxWallpaper = background == null ? null : Theme.Image(background.FullPath, 1920);
+            if (toolboxWallpaper == null) appearance.WallpaperId = null;
+            BuildShell(avatar);
             Navigate("Overview");
+            if (appearance.LoadError != null) Notify(appearance.LoadError, false);
             Closing += delegate(object sender, CancelEventArgs e)
             {
                 if (busy) { e.Cancel = true; Notify("Wait for the requested operation to finish before closing.", false); }
@@ -917,6 +1074,10 @@ namespace Astra.Toolbox
 
         private void BuildShell(BitmapImage avatar)
         {
+            content = new ContentControl();
+            notification = Theme.Text("No changes run on startup. Choose a setting to review it.", 12, Theme.Secondary, FontWeights.Normal);
+            sectionLabel = Theme.Text(page ?? "Overview", 13, Theme.Ink, FontWeights.SemiBold);
+            navigation.Clear();
             var shell = new Grid { Margin = new Thickness(12) };
             shell.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(204) }); shell.ColumnDefinitions.Add(new ColumnDefinition());
             var rail = new DockPanel { Margin = new Thickness(14, 20, 14, 16) };
@@ -935,7 +1096,12 @@ namespace Astra.Toolbox
             wordmark.Children.Add(Theme.Text("Gojo toolbox", 10, Theme.Secondary, FontWeights.Normal)); Grid.SetColumn(wordmark, 1); brand.Children.Add(wordmark);
             DockPanel.SetDock(brand, Dock.Top); rail.Children.Add(brand);
             var footer = new StackPanel { Margin = new Thickness(8, 17, 0, 0) };
-            footer.Children.Add(mode);
+            footer.Children.Add(Theme.Text("APPEARANCE", 9, Theme.Secondary, FontWeights.SemiBold));
+            themeSelector = Choice(new[] { "Light", "Dark", "Hollow Purple" }); themeSelector.Height = 34; themeSelector.Margin = new Thickness(0, 5, 0, 12);
+            themeSelector.SelectedIndex = (int)appearance.Mode; AutomationProperties.SetAutomationId(themeSelector, "ThemeMode"); AutomationProperties.SetName(themeSelector, "Toolbox appearance");
+            themeSelector.SelectionChanged += delegate { if (themeSelector.SelectedIndex >= 0 && !busy) ChangeAppearance((AppearanceMode)themeSelector.SelectedIndex); };
+            footer.Children.Add(themeSelector);
+            footer.Children.Add(Theme.Text(session.ReadOnly ? "Preview · read only" : (session.Admin.IsAdministrator ? "Elevated session" : "Standard user"), 11, Theme.Accent, FontWeights.SemiBold));
             var inventory = Theme.Text("228 original + " + SupplementalCatalog.All.Count + " additional\nOriginal-value snapshots", 10, Theme.Secondary, FontWeights.Normal);
             inventory.Margin = new Thickness(0, 6, 0, 0); footer.Children.Add(inventory); DockPanel.SetDock(footer, Dock.Bottom); rail.Children.Add(footer);
             var nav = new StackPanel();
@@ -969,7 +1135,47 @@ namespace Astra.Toolbox
             notification.MaxHeight = 42; notification.TextTrimming = TextTrimming.CharacterEllipsis;
             var statusBar = Theme.Glass(notification, new Thickness(13, 9, 13, 9), 9, false); statusBar.Margin = new Thickness(0, 12, 0, 0);
             Grid.SetRow(statusBar, 2); main.Children.Add(statusBar);
-            shell.Children.Add(main); Content = Theme.Stage(shell);
+            shell.Children.Add(main); Content = Theme.Stage(shell, toolboxWallpaper);
+        }
+
+        private void ChangeAppearance(AppearanceMode mode)
+        {
+            if (busy || appearance.Mode == mode) return;
+            appearance.Mode = mode; Theme.SetMode(mode); Theme.Refresh(this);
+            RebuildAppearance(); SaveAppearance("Toolbox theme changed. Windows appearance is unchanged.");
+        }
+
+        private void RebuildAppearance()
+        {
+            string current = page;
+            string query = page == "Tweaks" ? search.Text : null;
+            object group = page == "Tweaks" ? category.SelectedItem : null;
+            object set = page == "Tweaks" ? collection.SelectedItem : null;
+            object filter = page == "Tweaks" ? statusFilter.SelectedItem : null;
+            var chosenCaches = current == "Cleaner" ? cleanSelection.Where(item => item.Value.IsChecked == true).Select(item => item.Key).ToArray() : Array.Empty<CleanCategoryKind>();
+            var scroll = content.Content as ScrollViewer ?? (current == "Tweaks" ? VisualDescendants(tweaks).OfType<ScrollViewer>().FirstOrDefault() : null);
+            double offset = scroll == null ? 0 : scroll.VerticalOffset;
+            BuildShell(avatar); Navigate(current);
+            if (current == "Tweaks") { search.Text = query; category.SelectedItem = group; collection.SelectedItem = set; statusFilter.SelectedItem = filter; }
+            if (current == "Cleaner") foreach (var kind in chosenCaches) cleanSelection[kind].IsChecked = true;
+            content.UpdateLayout();
+            var viewer = content.Content as ScrollViewer ?? (current == "Tweaks" ? VisualDescendants(tweaks).OfType<ScrollViewer>().FirstOrDefault() : null);
+            if (viewer != null) { viewer.ScrollToVerticalOffset(offset); viewer.UpdateLayout(); }
+        }
+
+        private void SaveAppearance(string message)
+        {
+            try { appearance.Save(); Notify(message + (session.ReadOnly ? " Preview only; preferences are not saved." : " Preferences saved."), true); }
+            catch (Exception error) when (error is IOException || error is UnauthorizedAccessException) { Notify("Appearance changed for this session, but could not be saved. " + error.Message, false); }
+        }
+
+        private void SetToolboxWallpaper(WallpaperEntry entry)
+        {
+            if (busy) return;
+            var image = entry == null ? null : Theme.Image(entry.FullPath, 1920);
+            if (entry != null && (!wallpapers.Contains(entry) || image == null)) { Notify("Select a readable wallpaper from the library.", false); return; }
+            appearance.WallpaperId = entry == null ? null : entry.Id; toolboxWallpaper = image;
+            RebuildAppearance(); SaveAppearance(entry == null ? "Toolbox background removed. Windows desktop is unchanged." : "Toolbox background applied. Windows desktop is unchanged.");
         }
 
         private void Navigate(string destination)
@@ -1234,7 +1440,7 @@ namespace Astra.Toolbox
 
         private UIElement BuildWallpapers()
         {
-            var panel = new StackPanel(); panel.Children.Add(Heading("Wallpaper studio", "Browse, preview, then decide. Your Windows desktop changes only when you choose Apply."));
+            var panel = new StackPanel(); panel.Children.Add(Heading("Wallpaper studio", "Choose where it belongs: Windows desktop, toolbox background, or both. Browsing changes neither."));
             if (wallpaperError != null) { panel.Children.Add(Theme.Card(Theme.Text(wallpaperError, 14, Theme.Error, FontWeights.Normal))); return Scroll(panel); }
             var preview = new Grid { Height = 235, Background = Theme.Frost("#7CB9CFE4"), ClipToBounds = true };
             wallpaperPreview = new Image { Name = "WallpaperPreview", Stretch = Stretch.Uniform }; AutomationProperties.SetName(wallpaperPreview, "Selected wallpaper preview"); preview.Children.Add(wallpaperPreview);
@@ -1243,7 +1449,15 @@ namespace Astra.Toolbox
             var actions = new WrapPanel { Margin = new Thickness(0, 6, 0, 15) };
             wallpaperApply = Theme.Button("Apply to Windows desktop", true); wallpaperApply.Name = "ApplyWallpaper";
             wallpaperApply.Click += async delegate { await RunAsync(delegate { return session.WallpaperAsync(selectedWallpaper, false, false); }); }; actions.Children.Add(wallpaperApply);
-            var restore = Theme.Button("Restore previous desktop", false); restore.IsEnabled = !session.ReadOnly; restore.Click += async delegate { await RunAsync(delegate { return session.WallpaperAsync(null, true, false); }); }; actions.Children.Add(restore); panel.Children.Add(actions);
+            var restore = Theme.Button("Restore previous desktop", false); restore.Name = "RestoreWindowsWallpaper"; restore.IsEnabled = !session.ReadOnly; restore.Click += async delegate { await RunAsync(delegate { return session.WallpaperAsync(null, true, false); }); }; actions.Children.Add(restore); panel.Children.Add(actions);
+            var toolboxActions = new WrapPanel { Margin = new Thickness(0, 0, 0, 6) };
+            toolboxWallpaperApply = Theme.Button("Use as toolbox background", false); toolboxWallpaperApply.Name = "ApplyToolboxWallpaper";
+            toolboxWallpaperApply.Click += delegate { SetToolboxWallpaper(selectedWallpaper); }; toolboxActions.Children.Add(toolboxWallpaperApply);
+            toolboxWallpaperClear = Theme.Button("Remove toolbox background", false); toolboxWallpaperClear.Name = "ClearToolboxWallpaper"; toolboxWallpaperClear.IsEnabled = toolboxWallpaper != null;
+            toolboxWallpaperClear.Click += delegate { SetToolboxWallpaper(null); }; toolboxActions.Children.Add(toolboxWallpaperClear); panel.Children.Add(toolboxActions);
+            var activeBackground = appearance.ResolveWallpaper(wallpapers);
+            toolboxWallpaperStatus = Theme.Text(activeBackground == null ? "Toolbox background: theme only" : "Toolbox background: " + activeBackground.Title, 12, Theme.Secondary, FontWeights.Normal);
+            toolboxWallpaperStatus.Name = "ToolboxWallpaperStatus"; toolboxWallpaperStatus.Margin = new Thickness(0, 0, 0, 15); panel.Children.Add(toolboxWallpaperStatus);
             var library = new WrapPanel(); wallpaperButtons.Clear();
             foreach (var item in wallpapers)
             {
@@ -1253,7 +1467,7 @@ namespace Astra.Toolbox
                 var label = Theme.Text(entry.Title + (entry.Available ? "" : " · Missing asset"), 12, Theme.Ink, FontWeights.Normal); label.Margin = new Thickness(1, 10, 1, 3); thumb.Children.Add(label);
                 var button = Theme.Button("Preview " + entry.Title, false); button.Content = thumb; button.Padding = new Thickness(8); button.Margin = new Thickness(0, 0, 12, 12); button.ToolTip = "Preview " + entry.Title; button.Click += delegate { SelectWallpaper(entry); }; wallpaperButtons.Add(entry.Id, button); library.Children.Add(button);
             }
-            panel.Children.Add(library); panel.Children.Add(Theme.Text(wallpapers.Count + " wallpapers in the packaged library. Desktop changes are delegated only to the whitelisted Wallpaper.ps1 helper, with saved desktop values for Restore.", 12, Theme.Secondary, FontWeights.Normal));
+            panel.Children.Add(library); panel.Children.Add(Theme.Text(wallpapers.Count + " library wallpapers. Windows Apply asks for confirmation and saves the previous desktop for Restore. Toolbox backgrounds are optional, independent and saved with your app theme. In preview, appearance changes last only for this session.", 12, Theme.Secondary, FontWeights.Normal));
             if (selectedWallpaper == null && wallpapers.Count > 0) selectedWallpaper = wallpapers[0]; SelectWallpaper(selectedWallpaper); return Scroll(panel);
         }
 
@@ -1264,6 +1478,7 @@ namespace Astra.Toolbox
             wallpaperPreview.Source = entry == null ? null : Theme.Image(entry.FullPath, 1200);
             wallpaperTitle.Text = entry == null ? "Select a wallpaper" : entry.Title + (entry.Available ? " · Preview only" : " · Asset missing");
             wallpaperApply.IsEnabled = !session.ReadOnly && entry != null && entry.Available;
+            toolboxWallpaperApply.IsEnabled = entry != null && entry.Available && wallpaperPreview.Source != null;
             foreach (var item in wallpaperButtons)
             {
                 bool selected = entry != null && item.Key == entry.Id;
@@ -1308,11 +1523,11 @@ namespace Astra.Toolbox
         private async Task RunAsync(Func<Task<string>> operation)
         {
             if (busy) return;
-            busy = true; content.IsEnabled = false; foreach (var button in navigation.Values) button.IsEnabled = false;
+            busy = true; content.IsEnabled = false; themeSelector.IsEnabled = false; foreach (var button in navigation.Values) button.IsEnabled = false;
             try { Notify("Working on the requested operation…", true); string message = await operation(); Notify(message, true); }
             catch (OperationCanceledException) { Notify("Cancelled. No further action was taken.", false); }
             catch (Exception error) { Notify(error.Message, false); }
-            finally { busy = false; content.IsEnabled = true; foreach (var button in navigation.Values) button.IsEnabled = true; Navigate(page); }
+            finally { busy = false; content.IsEnabled = true; themeSelector.IsEnabled = true; foreach (var button in navigation.Values) button.IsEnabled = true; Navigate(page); }
         }
 
         private async Task SelfTestAsync(string outputDirectory)
@@ -1391,6 +1606,60 @@ namespace Astra.Toolbox
             if (wallpapers.Count > 1) wallpaperButtons[wallpapers[1].Id].RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
             check(selectedWallpaper == wallpapers[1] && wallpaperPreview.Source != null && wallpaperTitle.Text.Contains(wallpapers[1].Title), "wallpaper selection updates preview");
             check(!wallpaperApply.IsEnabled, "preview wallpaper apply disabled"); await RenderAsync(Path.Combine(outputDirectory, "wallpapers.png"));
+            check(toolboxWallpaperApply.IsEnabled && !toolboxWallpaperClear.IsEnabled, "preview allows app-only background and starts without one");
+            var chosenWallpaper = selectedWallpaper;
+            toolboxWallpaperApply.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            check(appearance.WallpaperId == chosenWallpaper.Id && toolboxWallpaper != null && toolboxWallpaperClear.IsEnabled, "toolbox background applies independently");
+            check(VisualDescendants((DependencyObject)Content).OfType<Image>().Any(image => image.Name == "ToolboxWallpaperBackground" && !image.IsHitTestVisible), "toolbox wallpaper renders behind interactive controls");
+            foreach (AppearanceMode theme in Enum.GetValues(typeof(AppearanceMode)))
+            {
+                themeSelector.SelectedIndex = (int)theme;
+                check(Theme.Mode == theme && appearance.Mode == theme && page == "Wallpapers" && selectedWallpaper == chosenWallpaper, "theme selection preserves page and wallpaper " + theme);
+                check(!wallpaperApply.IsEnabled && toolboxWallpaper != null, "theme preserves preview and background " + theme);
+                await RenderAsync(Path.Combine(outputDirectory, "theme-" + theme.ToString().ToLowerInvariant() + ".png"));
+                var ink = Theme.Brush(Theme.Ink).Color; var field = Theme.Brush(Theme.Background).Color;
+                Func<Color, double> luminance = color => new[] { (double)color.R, color.G, color.B }.Select(value => value / 255).Select(value => value <= 0.04045 ? value / 12.92 : Math.Pow((value + 0.055) / 1.055, 2.4)).Zip(new[] { 0.2126, 0.7152, 0.0722 }, (value, weight) => value * weight).Sum();
+                double first = luminance(ink), second = luminance(field);
+                check((Math.Max(first, second) + 0.05) / (Math.Min(first, second) + 0.05) >= 4.5, "theme body text contrast " + theme);
+                var scrim = (LinearGradientBrush)((Grid)Content).Children.OfType<Border>().First().Background;
+                foreach (var stop in scrim.GradientStops)
+                {
+                    double alpha = stop.Color.A / 255.0; double baseValue = theme == AppearanceMode.Light ? 0 : 255;
+                    var backdrop = Color.FromRgb((byte)Math.Round(stop.Color.R * alpha + baseValue * (1 - alpha)), (byte)Math.Round(stop.Color.G * alpha + baseValue * (1 - alpha)), (byte)Math.Round(stop.Color.B * alpha + baseValue * (1 - alpha)));
+                    double textLight = luminance(Theme.Brush(Theme.Secondary).Color), backLight = luminance(backdrop);
+                    check((Math.Max(textLight, backLight) + 0.05) / (Math.Min(textLight, backLight) + 0.05) >= 4.5, "wallpaper scrim keeps secondary text readable " + theme + " " + stop.Offset);
+                }
+                Navigate("System"); check(createRestorePoint != null && !createRestorePoint.IsEnabled, "theme keeps System restore-point guard " + theme);
+                Navigate("Tweaks"); search.Text = "exm-chrome-webusb-off";
+                themeSelector.SelectedIndex = ((int)theme + 1) % 3;
+                check(page == "Tweaks" && search.Text == "exm-chrome-webusb-off" && tweaks.Items.Count == 1 && VirtualizingPanel.GetIsVirtualizing(tweaks), "theme retains tweak search and virtualization " + theme);
+                Navigate("Wallpapers");
+            }
+            toolboxWallpaperClear.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent));
+            check(appearance.WallpaperId == null && toolboxWallpaper == null && !toolboxWallpaperClear.IsEnabled, "remove toolbox background leaves theme only");
+            check(!VisualDescendants((DependencyObject)Content).OfType<Image>().Any(image => image.Name == "ToolboxWallpaperBackground"), "removed background leaves no image layer");
+            check(((SolidColorBrush)((Grid)Content).Background).Color.A == 0, "stage retains native acrylic rather than an opaque client backdrop");
+            Navigate("Cleaner"); var cacheKind = cleanSelection.Keys.First(); cleanSelection[cacheKind].IsChecked = true;
+            ChangeAppearance(AppearanceMode.Dark);
+            check(cleanSelection[cacheKind].IsChecked == true && cleanSelection.Count(item => item.Value.IsChecked == true) == 1, "theme retains explicit cleaner category selection");
+            Navigate("Tweaks"); content.UpdateLayout();
+            var tweakScroll = VisualDescendants(tweaks).OfType<ScrollViewer>().First(); tweakScroll.ScrollToVerticalOffset(12); content.UpdateLayout(); double previousOffset = tweakScroll.VerticalOffset;
+            check(previousOffset > 0, "tweak scroll fixture starts below the first item");
+            ChangeAppearance(AppearanceMode.HollowPurple);
+            check(Math.Abs(VisualDescendants(tweaks).OfType<ScrollViewer>().First().VerticalOffset - previousOffset) < 0.1, "theme retains tweak list scroll position");
+            var fixturePath = Path.Combine(outputDirectory, "appearance-fixture.json");
+            var fixture = ToolboxAppearance.Load(fixturePath); fixture.Mode = AppearanceMode.HollowPurple; fixture.WallpaperId = chosenWallpaper.Id; fixture.Save();
+            var reloaded = ToolboxAppearance.Load(fixturePath);
+            check(reloaded.Mode == AppearanceMode.HollowPurple && reloaded.WallpaperId == chosenWallpaper.Id && reloaded.ResolveWallpaper(wallpapers) == chosenWallpaper, "appearance persists and reloads from isolated fixture");
+            reloaded.WallpaperId = "../../not-a-library-image"; reloaded.Save();
+            check(ToolboxAppearance.Load(fixturePath).ResolveWallpaper(wallpapers) == null, "unrecognized persisted wallpaper cannot escape library");
+            File.WriteAllText(fixturePath, "{\"Theme\":\"999\",\"WallpaperId\":false}");
+            reloaded = ToolboxAppearance.Load(fixturePath); check(reloaded.Mode == AppearanceMode.Light && reloaded.WallpaperId == null, "invalid preference values use safe defaults");
+            File.WriteAllText(fixturePath, "broken json");
+            reloaded = ToolboxAppearance.Load(fixturePath); check(reloaded.LoadError != null && reloaded.Mode == AppearanceMode.Light, "malformed appearance file does not prevent startup");
+            var memoryOnly = ToolboxAppearance.Load(null); memoryOnly.Mode = AppearanceMode.Dark; memoryOnly.Save(); appearance.Save();
+            check(session.MutationDispatches == 0, "preview appearance never dispatches Windows mutations");
+            ChangeAppearance(AppearanceMode.Light);
             var blocked = await session.ChangeTweakAsync(session.Catalog[0].Id, false, true);
             check(!blocked.Success && !blocked.RequiresElevation, "preview action guard rejects a requested change without invoking engine apply");
             bool writableRejected = false;

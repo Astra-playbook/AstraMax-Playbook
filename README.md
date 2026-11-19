@@ -6,6 +6,7 @@ An AME Wizard Beta `.apbx` playbook that combines:
 - **Four-tier debloat** — Light, Moderate, Extreme or the warned Insane strip of preinstalled apps for every account, logged to `C:\AstraMax\Debloat\removed.json`
 - **Four-tier service debloat** — independent Light, Moderate, Extreme (Caution) and warned Insane tiers that set background services to Disabled and delete their cache/report folders; the Insane tier also disables per-user service templates, clears stale per-user keys and merges svchost groups, with startup types snapshotted for exact restore
 - **Astra Gojo Toolbox** — a native frosted-glass Windows app with 266 tweaks across 22 categories (228 originals plus 38 reviewed additions), power presets, games, cleaner and nine wallpapers; replaces the retired Astra Max installer and UI while retaining the original tweak engine and `%LOCALAPPDATA%\AstraPC` snapshots
+- **Toolbox appearance** — saved Light, Dark and Hollow Purple modes; separate Windows wallpaper apply/restore and optional toolbox background apply/remove controls. App preferences are stored separately from tweak snapshots, and preview appearance changes stay in memory.
 - **System and recovery** — read-only PC inventory, evidence-based improvement advice, saved-value restoration and explicit Windows restore-point creation; no invented sensors or guaranteed FPS gains
 - **Power and interrupt tuning** — core parking off, MSI interrupts, optional interrupt spreading or core-0 pinning
 - **Network stack, DNS and DoH presets** — balanced or low-latency stack, four resolver choices, optional encrypted DNS
@@ -31,8 +32,8 @@ Target: Windows 11 22H2/23H2/24H2/25H2/26H2 (22621, 22631, 26100, 26200, 26300),
 
 ## Download
 
-- **[Astra-V1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/refs/heads/main/Astra-V1.apbx)** - 203,182,385 bytes, AME Wizard Beta playbook with the frosted-glass Gojo toolbox, 266 tweaks, 52 wizard pages and 41 reviewed opt-in Windows/browser choices (7z/AES-256, password `malte`)
-- **SHA256:** `934F412D438C4E546D0340A3AC9167D219A987AA4A8AA505D733377EE36D9400`
+- **[Astra-V1.apbx](https://github.com/Astra-playbook/AstraMax-Playbook/raw/refs/heads/main/Astra-V1.apbx)** - 203,188,289 bytes, AME Wizard Beta playbook with the frosted-glass Gojo toolbox, 266 tweaks, 52 wizard pages and 41 reviewed opt-in Windows/browser choices (7z/AES-256, password `malte`)
+- **SHA256:** `240B9A9F49A38F46C9855735B1D6FC83BD72B6E2E76A8364B3F5208217056E4D`
 
 The playbook is stored with Git LFS, so use the link above instead of copying the repository pointer file. Verify the hash with `Get-FileHash .\Astra-V1.apbx -Algorithm SHA256` before applying.
 
@@ -721,7 +722,7 @@ stays usable from other tooling.
 **Verification limits:**
 
 - The native launcher is unsigned; verify the archive hash and inspect the source rather than blindly bypassing warnings.
-- The final packaged app passed 378 isolated self-test checks from a path containing spaces. Native preview interactions, exact-value snapshot fixtures and mocked System/restore-point helpers passed without production tweaks or a real restore point.
+- The final packaged app passed 416 isolated self-test checks from a path containing spaces. Native preview interactions, exact-value snapshot fixtures and mocked System/restore-point helpers passed without production tweaks or a real restore point.
 - Website images are actual native preview captures. Website interaction and responsive-layout checks passed; its visual screenshot capture was blocked by the hidden Qoder browser pane.
 - A full AME install on a clean VM, deployed live tweaks, real Windows restore-point creation and FPS claims remain untested.
 
@@ -735,7 +736,7 @@ powershell -ExecutionPolicy Bypass -File tools/validate.ps1
 powershell -ExecutionPolicy Bypass -File tools/build.ps1
 ```
 
-`validate.ps1` parses `playbook.conf`, checks page limits, parses every PowerShell helper, and verifies every `!task` include. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `Astra-V1.apbx` unless `-Output` is given. The public artifact is SHA256 `934F412D438C4E546D0340A3AC9167D219A987AA4A8AA505D733377EE36D9400`. The build excludes retired installers/apps, toolbox C# source and the commercial StartAllBack installer.
+`validate.ps1` parses `playbook.conf`, checks page limits, parses every PowerShell helper, and verifies every `!task` include. `build.ps1` checks required files, packages `src/` with `playbook.conf` at the archive root, prints contents and SHA256, and writes `Astra-V1.apbx` unless `-Output` is given. The public artifact is SHA256 `240B9A9F49A38F46C9855735B1D6FC83BD72B6E2E76A8364B3F5208217056E4D`. The build excludes retired installers/apps, toolbox C# source and the commercial StartAllBack installer.
 
 `Astra-V1.apbx` is tracked through Git LFS. Toolbox source, compiled app and art live in `src/Executables/Toolbox`; use `tools/build-toolbox.ps1` to compile after source changes and `tools/package-toolbox.ps1` for standalone ZIPs. The vendor runtime installers in `src/Executables/Redist/` and `tools/7zr.exe` are gitignored and must be supplied locally to rebuild; the retired Astra Max installer is no longer required.
 
@@ -760,7 +761,7 @@ If AME still refuses the file at load, check the message. `Playbook must be encr
 
 Public branding is Astra V1 and the internal playbook version remains 1.0. The archive contains the replacement Gojo toolbox, its unchanged original engine, System/restore-point helpers, nine wallpapers and 52 wizard pages. All 41 reviewed Windows/browser choices default to off; existing preset/security defaults are unchanged. StartAllBack remains an optional paid vendor download and is not redistributed.
 
-`tools/validate.ps1` passed XML, page-limit, PowerShell and YAML/reference checks. The packaged app passed 378 isolated checks; exact-value fixtures covered all 38 supplemental definitions, CLI fixtures checked all 41 apply/revert gates and restoration coverage, and native preview interactions passed. The encrypted APBX passed integrity/header checks, and selected configuration, binary and recovery-helper entries were extracted and matched against source hashes.
+`tools/validate.ps1` passed XML, page-limit, PowerShell and YAML/reference checks. The packaged app passed 416 isolated checks; exact-value fixtures covered all 38 supplemental definitions, CLI fixtures checked all 41 apply/revert gates and restoration coverage, and native preview interactions passed. The encrypted APBX passed integrity/header checks, and selected configuration, binary and recovery-helper entries were extracted and matched against source hashes.
 
 The site uses actual final native Gojo toolbox screenshots and a 52-page read-only explorer. Browser download/hash, explorer and responsive-layout checks passed; a visual website capture remains unverified because the browser pane was hidden. No production tweak, real restore point, full AME installation, StartAllBack install or game benchmark was executed for this release.
 ## Smoke-test checklist (VM first)

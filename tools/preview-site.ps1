@@ -14,7 +14,7 @@ try {
             if (-not $relative) { $relative = 'index.html' }
             $file = [IO.Path]::GetFullPath((Join-Path $root $relative))
             if ($file.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -and (Test-Path -LiteralPath $file -PathType Leaf)) {
-                $context.Response.ContentType = switch ([IO.Path]::GetExtension($file)) { '.html' { 'text/html; charset=utf-8' } '.js' { 'text/javascript; charset=utf-8' } '.css' { 'text/css; charset=utf-8' } '.svg' { 'image/svg+xml' } '.png' { 'image/png' } '.jpg' { 'image/jpeg' } default { 'application/octet-stream' } }
+                $context.Response.ContentType = switch ([IO.Path]::GetExtension($file)) { '.html' { 'text/html; charset=utf-8' } '.js' { 'text/javascript; charset=utf-8' } '.css' { 'text/css; charset=utf-8' } '.svg' { 'image/svg+xml' } '.ico' { 'image/x-icon' } '.png' { 'image/png' } '.jpg' { 'image/jpeg' } default { 'application/octet-stream' } }
                 $bytes = [IO.File]::ReadAllBytes($file)
                 $context.Response.ContentLength64 = $bytes.Length
                 $context.Response.OutputStream.Write($bytes, 0, $bytes.Length)

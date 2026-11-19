@@ -44,6 +44,15 @@ function Navigate([string]$Name) {
     $button.GetCurrentPattern([Windows.Automation.InvokePattern]::Pattern).Invoke()
     $null = Wait-For { (Find-Id ('Nav' + $Name)).Current.HelpText -eq 'Current page' } "navigation $Name"
 }
+function Select-Theme([string]$Name) {
+    $combo = Find-Id 'ThemeMode'
+    $combo.GetCurrentPattern([Windows.Automation.ExpandCollapsePattern]::Pattern).Expand()
+    $condition = New-Object Windows.Automation.PropertyCondition([Windows.Automation.AutomationElement]::NameProperty, $Name)
+    $item = Wait-For { $combo.FindFirst([Windows.Automation.TreeScope]::Descendants, $condition) } "theme option $Name"
+    $item.GetCurrentPattern([Windows.Automation.SelectionItemPattern]::Pattern).Select()
+    $null = Wait-For { $selection = (Find-Id 'ThemeMode').GetCurrentPattern([Windows.Automation.SelectionPattern]::Pattern).Current.GetSelection(); $selection.Count -eq 1 -and $selection[0].Current.Name -eq $Name } "selected theme $Name"
+    (Find-Id 'ThemeMode').GetCurrentPattern([Windows.Automation.ExpandCollapsePattern]::Pattern).Collapse()
+}
 try {
     $child = Wait-For { Get-CimInstance Win32_Process -Filter "ParentProcessId=$($launcher.Id)" -OperationTimeoutSec 5 | Where-Object Name -eq 'dotnet.exe' | Select-Object -First 1 } 'owned toolbox process' 30
     Assert ($child.CommandLine -match '--preview' -and $child.CommandLine -notmatch '--self-test') 'native interactions target only the owned preview process'
@@ -83,28 +92,72 @@ try {
         Assert ((Find-Id ('Nav' + $name)).Current.HelpText -eq 'Current page') "real navigation opens $name"
         if ($name -eq 'Wallpapers') { Save-WindowScreenshot 'native-wallpapers.png' }
     }
+    Navigate 'Wallpapers'
+    Assert (-not (Find-Id 'ApplyWallpaper').Current.IsEnabled -and -not (Find-Id 'RestoreWindowsWallpaper').Current.IsEnabled) 'Windows wallpaper apply and restore remain blocked in preview'
+    Assert ((Find-Id 'ApplyToolboxWallpaper').Current.IsEnabled -and -not (Find-Id 'ClearToolboxWallpaper').Current.IsEnabled) 'toolbox-only wallpaper is optional and available in preview'
+    (Find-Id 'ApplyToolboxWallpaper').GetCurrentPattern([Windows.Automation.InvokePattern]::Pattern).Invoke()
+    $null = Wait-For { (Find-Id 'ToolboxWallpaperStatus').Current.Name -like '*Gojo*' } 'applied toolbox background'
+    foreach ($theme in 'Light','Dark','Hollow Purple') {
+        Select-Theme $theme
+        Assert ((Find-Id 'ClearToolboxWallpaper').Current.IsEnabled -and -not (Find-Id 'ApplyWallpaper').Current.IsEnabled) "real $theme theme preserves app background and preview guards"
+        Save-WindowScreenshot ('native-wallpapers-' + $theme.Replace(' ','-').ToLowerInvariant() + '.png')
+        foreach ($name in 'Overview','Tweaks','System','Power','Games','Cleaner','Wallpapers') {
+            Navigate $name
+            Assert ((Find-Id ('Nav' + $name)).Current.HelpText -eq 'Current page') "real $theme theme opens $name"
+            if ($name -eq 'Overview') { Save-WindowScreenshot ('native-theme-' + $theme.Replace(' ','-').ToLowerInvariant() + '.png') }
+        }
+        Navigate 'Tweaks'
+        (Find-Id 'TweakSearch').GetCurrentPattern([Windows.Automation.ValuePattern]::Pattern).SetValue('exm-chrome-webusb-off')
+        Select-Theme $(if ($theme -eq 'Dark') { 'Light' } else { 'Dark' })
+        Assert ((Find-Id 'TweakSearch').GetCurrentPattern([Windows.Automation.ValuePattern]::Pattern).Current.Value -eq 'exm-chrome-webusb-off') "real theme change preserves $theme tweak search"
+        Select-Theme $theme
+        Navigate 'Wallpapers'
+    }
+    (Find-Id 'ClearToolboxWallpaper').GetCurrentPattern([Windows.Automation.InvokePattern]::Pattern).Invoke()
+    $null = Wait-For { (Find-Id 'ToolboxWallpaperStatus').Current.Name -eq 'Toolbox background: theme only' } 'cleared toolbox background'
+    Assert (-not (Find-Id 'ClearToolboxWallpaper').Current.IsEnabled -and -not (Find-Id 'ApplyWallpaper').Current.IsEnabled) 'removing app background leaves Windows wallpaper untouched'
+    Save-WindowScreenshot 'native-purple-theme-only.png'
+    Select-Theme 'Light'
+    Navigate 'Tweaks'
+    $scroll = (Find-Id 'TweakList').GetCurrentPattern([Windows.Automation.ScrollPattern]::Pattern)
+    $scroll.SetScrollPercent([Windows.Automation.ScrollPattern]::NoScroll, 50)
+    $null = Wait-For { $scroll.Current.VerticalScrollPercent -gt 20 } 'scrolled tweak library'
+    $offset = $scroll.Current.VerticalScrollPercent
+    Select-Theme 'Dark'
+    $restoredScroll = (Find-Id 'TweakList').GetCurrentPattern([Windows.Automation.ScrollPattern]::Pattern)
+    Assert ([Math]::Abs($restoredScroll.Current.VerticalScrollPercent - $offset) -lt 1) 'real theme change preserves tweak scroll position'
+    Navigate 'Cleaner'
+    $condition = New-Object Windows.Automation.PropertyCondition([Windows.Automation.AutomationElement]::ControlTypeProperty, [Windows.Automation.ControlType]::CheckBox)
+    $checkbox = $window.FindFirst([Windows.Automation.TreeScope]::Descendants, $condition)
+    $label = $checkbox.Current.Name
+    $checkbox.GetCurrentPattern([Windows.Automation.TogglePattern]::Pattern).Toggle()
+    Select-Theme 'Hollow Purple'
+    Assert ((Find-Element $label).GetCurrentPattern([Windows.Automation.TogglePattern]::Pattern).Current.ToggleState -eq [Windows.Automation.ToggleState]::On) 'real theme change retains explicitly selected cleaner category without deleting anything'
+    Select-Theme 'Light'
     $transform = $window.GetCurrentPattern([Windows.Automation.TransformPattern]::Pattern)
     $transform.Resize(900,650)
     $null = Wait-For { $window.Current.BoundingRectangle.Width -le 901 } 'minimum-size resize'
     foreach ($name in 'Overview','Tweaks','System','Power','Games','Cleaner','Wallpapers') {
         Assert (-not (Find-Id ('Nav' + $name)).Current.IsOffscreen) "minimum-size sidebar keeps $name visible"
     }
-    Navigate 'System'
+    Assert (-not (Find-Id 'ThemeMode').Current.IsOffscreen) 'appearance selector remains visible at minimum size'
+    foreach ($theme in 'Light','Dark','Hollow Purple') { Select-Theme $theme; Navigate 'System'; Assert (-not (Find-Id 'CreateRestorePoint').Current.IsOffscreen) "minimum-size $theme System keeps checkpoint visible" }
     Save-WindowScreenshot 'native-system-small.png'
     Assert (-not (Find-Id 'CreateRestorePoint').Current.IsOffscreen) 'restore-point button is visible at minimum window size'
     Assert ($null -ne (Find-Element ('Preview ' + [char]0x00B7 + ' read only'))) 'actual window remains in non-mutating preview mode'
     (Find-Element 'Refresh state').GetCurrentPattern([Windows.Automation.InvokePattern]::Pattern).Invoke()
     $reader = Wait-For { Get-CimInstance Win32_Process -Filter "ParentProcessId=$($child.ProcessId)" -OperationTimeoutSec 5 | Where-Object Name -eq 'powershell.exe' | Select-Object -First 1 } 'owned background inventory reader' 20
     $null = Wait-For { (Find-Id 'NavTweaks').Current.IsEnabled } 'navigation during background scan'
+    Select-Theme 'Dark'
     Navigate 'Tweaks'
-    Assert ((Find-Id 'NavTweaks').Current.HelpText -eq 'Current page') 'navigation stays usable during an active hardware scan'
+    Assert ((Find-Id 'NavTweaks').Current.HelpText -eq 'Current page') 'theme change and navigation stay usable during an active hardware scan'
     $jobs = @(Get-CimInstance Win32_Process -Filter "ParentProcessId=$($reader.ProcessId)" -OperationTimeoutSec 5)
     $window.GetCurrentPattern([Windows.Automation.WindowPattern]::Pattern).Close()
     $window = $null
     Assert ($launcher.WaitForExit(10000)) 'closing during a background scan exits the owned app'
     $null = Wait-For { $alive = @(@($reader) + $jobs | Where-Object { Get-Process -Id $_.ProcessId -ErrorAction SilentlyContinue }); $alive.Count -eq 0 } 'owned inventory process cleanup' 10
     Assert (@(Get-CimInstance Win32_Process -Filter "ParentProcessId=$($reader.ProcessId)" -OperationTimeoutSec 5).Count -eq 0) 'closing stops only the owned inventory reader and its child jobs'
-    'Native window interaction tests passed; no restore point, apply, cleanup or wallpaper action ran.'
+    'Native window interaction tests passed; only app appearance changed. No Windows wallpaper, tweaks, cleanup or restore-point action ran.'
 } catch {
     if ($window) {
         Save-WindowScreenshot 'native-failure.png'
